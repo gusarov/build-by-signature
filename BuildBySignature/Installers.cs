@@ -89,7 +89,7 @@ namespace BuildBySignature
 			{
 				var import = xmlDoc.CreateElement("Import", ns);
 
-				var pathToTargets = Path.Combine(_tragetDir, GetTargetsName(afterOrBefore));
+				var pathToTargets = Path.Combine(_tragetDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), GetTargetsName(afterOrBefore));
 
 				import.SetAttribute("Project", pathToTargets);
 				import.SetAttribute("Condition", @"Exists('" + pathToTargets + "')");
