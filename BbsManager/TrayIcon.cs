@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using MyUtils.UAC;
 
 namespace BbsManager
 {
@@ -12,6 +13,7 @@ namespace BbsManager
 		private NotifyIcon _icon;
 		private ContextMenu _menu;
 		MenuItem _defaultMi;
+		MenuItem _defaultMi2;
 		MenuItem _enableMi;
 		MenuItem _disableMi;
 		MenuItem _enableLmMi;
@@ -21,23 +23,23 @@ namespace BbsManager
 		public void InitializeComponents()
 		{
 			_icon = new NotifyIcon
-			        	{
-			        		Text = @"Bbs Manager",
-							Visible =  true,
-							Icon =  Properties.Resources.Icon,
-			        	};
-
+			{
+				Text = @"Bbs Manager",
+				Visible = true,
+				Icon = Properties.Resources.Icon,
+			};
 
 			_menu = new ContextMenu();
-			_system.MenuItems.Add(_defaultMi = new MenuItem("CurrentUser: Default ({0})", Default_Click));
-			_system.MenuItems.Add(new MenuItem("-"));
+			_menu.MenuItems.Add(_defaultMi = new MenuItem("Default ({0})", Default_Click));
 			_menu.MenuItems.Add(_enableMi = new MenuItem("Enable", Enable_Click));
 			_menu.MenuItems.Add(_disableMi = new MenuItem("Disable", Disable_Click));
 			_menu.MenuItems.Add(new MenuItem("-"));
 			_system = new MenuItem("Options");
 			_menu.MenuItems.Add(_system);
-			_enableLmMi = _system.MenuItems.Add("System-wide: Enable");
-			_disableLmMi = _system.MenuItems.Add("System-wide: Disable");
+			_system.MenuItems.Add(_defaultMi2 = new MenuItem("CurrentUser: Default ({0})", Default_Click));
+			_system.MenuItems.Add(new MenuItem("-"));
+			_enableLmMi = _system.MenuItems.Add("System-wide: Enable", SwEnable_Click);
+			_disableLmMi = _system.MenuItems.Add("System-wide: Disable", SwDisable_Click);
 			_system.MenuItems.Add(new MenuItem("-"));
 			_system.MenuItems.Add(new MenuItem("Close", Close_Click));
 			_menu.Popup += new EventHandler(_menu_Popup);
@@ -55,8 +57,8 @@ namespace BbsManager
 			}
 			if (_vm.IsEnabled == null)
 			{
-				_defaultMi.Checked = true;
-				_defaultMi.Enabled = false;
+				_defaultMi2.Checked = true;
+				_defaultMi2.Enabled = false;
 			}
 			if (_vm.IsEnabledLocalMachine)
 			{
@@ -79,6 +81,7 @@ namespace BbsManager
 				item.Checked = false;
 				item.Enabled = true;
 			}
+			_defaultMi.Visible = false;
 			switch (_vm.IsEnabled)
 			{
 				case true:
@@ -92,9 +95,41 @@ namespace BbsManager
 				default:
 					_defaultMi.Checked = true;
 					_defaultMi.Enabled = false;
+					_defaultMi.Visible = true;
+					_defaultMi2.Checked = true;
+					_defaultMi2.Enabled = false;
 					break;
 			}
-			_defaultMi.Text = string.Format("CurrentUser: Default ({0})", _vm.IsEnabledLocalMachine ? "Enabled" : "Disabled");
+			_defaultMi.Text = string.Format("Default ({0})", _vm.IsEnabledLocalMachine ? "Enabled" : "Disabled");
+			_defaultMi2.Text = string.Format("CurrentUser: Default ({0})", _vm.IsEnabledLocalMachine ? "Enabled" : "Disabled");
+		}
+
+		public class UacCall : IElevationCall
+		{
+			public string Call(string args)
+			{
+				var vm = new TrayIconViewModel();
+				switch (args)
+				{
+					case "SwEnable":
+						vm.IsEnabledLocalMachine = true;
+						break;
+					case "SwDisable":
+						vm.IsEnabledLocalMachine = false;
+						break;
+				}
+				return null;
+			}
+		}
+
+		void SwEnable_Click(object sender, EventArgs eventArgs)
+		{
+			Elevation.Instance.OneTimePerProcess<UacCall>("SwEnable", false);
+		}
+
+		void SwDisable_Click(object sender, EventArgs eventArgs)
+		{
+			Elevation.Instance.OneTimePerProcess<UacCall>("SwDisable", false);
 		}
 
 		void Default_Click(object sender, EventArgs eventArgs)
@@ -121,6 +156,11 @@ namespace BbsManager
 		{
 			_icon.Dispose();
 		}
+
+		internal void FirstBalloon()
+		{
+			_icon.ShowBalloonTip(15000, "Build by Signature", "Here you can turn me on and off", ToolTipIcon.Info);
+		}
 	}
 
 	class TrayIconViewModel
@@ -129,12 +169,13 @@ namespace BbsManager
 		{
 			get
 			{
-				var value = (string)Registry.CurrentUser.GetValue(@"SOFTWARE\Bbs\Enabled", null);
+				var value = (string)Registry.GetValue(@"HKEY_CURRENT_USER\Software\Bbs", "Enabled", null);
 				return string.IsNullOrEmpty(value) ? default(bool?) : bool.Parse(value);
 			}
 			set
 			{
-				Registry.CurrentUser.SetValue(@"SOFTWARE\Bbs\Enabled", value == null ? string.Empty : value.ToString());
+				Registry.SetValue(@"HKEY_CURRENT_USER\Software\Bbs", "Enabled", value == null ? string.Empty : value.ToString());
+				Registry.SetValue(@"HKEY_CURRENT_USER\Software\Wow6432Node\Bbs", "Enabled", value == null ? string.Empty : value.ToString());
 			}
 		}
 
@@ -142,12 +183,13 @@ namespace BbsManager
 		{
 			get
 			{
-				var value = (string)Registry.LocalMachine.GetValue(@"SOFTWARE\Bbs\Enabled", null);
+				var value = (string)Registry.GetValue(@"HKEY_LOCAL_MACHINE\Software\Bbs", "Enabled", null);
 				return string.IsNullOrEmpty(value) ? default(bool) : bool.Parse(value);
 			}
 			set
 			{
-				Registry.LocalMachine.SetValue(@"SOFTWARE\Bbs\Enabled", value.ToString());
+				Registry.SetValue(@"HKEY_LOCAL_MACHINE\Software\Bbs", "Enabled", value.ToString());
+				Registry.SetValue(@"HKEY_LOCAL_MACHINE\Software\Wow6432Node\Bbs", "Enabled", value.ToString());
 			}
 		}
 	}

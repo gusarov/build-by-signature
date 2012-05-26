@@ -32,18 +32,28 @@ namespace BbsManager
 			_tray.InitializeComponents();
 		}
 
+		protected override void OnExit(ExitEventArgs e)
+		{
+			_tray.Dispose();
+			base.OnExit(e);
+		}
+
 		[STAThreadAttribute]
 		[DebuggerNonUserCodeAttribute]
 		public static void Main(string[] args)
 		{
-			if (args.Any(x => x == "install"))
+			if (args.Any(x => x == "-install"))
 			{
 				// return from this process immediately, since it is MSI step
-				Process.Start(typeof(App).Assembly.Location, "-autorun");
+				Process.Start(typeof(App).Assembly.Location, "-first");
 				return;
 			}
+			var first = args.Any(x => x == "-first");
 			BbsManager.App app = new BbsManager.App();
 			app.InitializeComponent();
+			if(first){
+				app._tray.FirstBalloon();
+			}
 			app.Run();
 		}
 	}

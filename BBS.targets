@@ -1,15 +1,32 @@
 <Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003'>
 	<PropertyGroup>
 		<BbsFile>$(TargetName).bbs</BbsFile>
-		<BbsState>Initial</BbsState>
 		<!--<BbsState>Initial</BbsState>-->
 		<!--<BbsState>Trial</BbsState>-->
 		<!--<BbsState>CompileAnyway</BbsState>-->
 	</PropertyGroup>
 
+	<Target Name='BbsDetectState' BeforeTargets='CoreCompile'>
+		<CreateProperty Value="$(registry:HKEY_CURRENT_USER\Software\Bbs@Enabled)">
+			<Output PropertyName="BbsEnabled" TaskParameter="ValueSetByTask" />
+		</CreateProperty>
+		<CreateProperty Value="$(registry:HKEY_LOCAL_MACHINE\Software\Bbs@Enabled)" Condition="'$(BbsEnabled)'==''">
+			<Output PropertyName="BbsEnabled" TaskParameter="ValueSetByTask" />
+		</CreateProperty>
+		<CreateProperty Value="False" Condition="'$(BbsEnabled)'==''">
+			<Output PropertyName="BbsEnabled" TaskParameter="ValueSetByTask" />
+		</CreateProperty>
+		
+		<Message Importance="high" Text=" * Bbs Enabled = $(BbsEnabled)" />
+		
+		<CreateProperty Value="Initial" Condition="'$(BbsEnabled)'=='True'">
+			<Output PropertyName="BbsState" TaskParameter="ValueSetByTask" />
+		</CreateProperty>
+	</Target>
+
 	<UsingTask AssemblyFile='BBS.DLL' TaskName='GenerateHashTask' />
 
-	<Target Name='BbsGenerateHash' AfterTargets='CopyFilesToOutputDirectory' Inputs='$(TargetPath)' Outputs='$(TargetDir)$(TargetName).bbs' >
+	<Target Name='BbsGenerateHash' Condition="'$(BbsEnabled)'=='True'" AfterTargets='CopyFilesToOutputDirectory;BbsDetectState' Inputs='$(TargetPath)' Outputs='$(TargetDir)$(TargetName).bbs' >
 		<Message Text=' * Bbs GenerateHash $(TargetName)' Importance='high'/>
 		<GenerateHashTask
 			TargetPath='$(TargetPath)'
@@ -18,7 +35,7 @@
 		</GenerateHashTask>
 	</Target>
 
-	<Target Name='BbsBeforeCompile' BeforeTargets='CoreCompile' >
+	<Target Name='BbsBeforeCompile' BeforeTargets='CoreCompile' Condition="'$(BbsEnabled)'=='True'">
 		<Message Text=' * Bbs BeforeCompile [BbsState = $(BbsState)]' Importance='high'/>
 		<ItemGroup>
 			<BbsReferencePathBackup Include="@(ReferencePath)" />
@@ -213,7 +230,7 @@ foreach (var reference in References)
 		</ItemGroup>
 	</Target>
 	
-	<Target Name='BbsAfterCompile' AfterTargets='CoreCompile' >
+	<Target Name='BbsAfterCompile' AfterTargets='CoreCompile' Condition="'$(BbsEnabled)'=='True'">
 		<ItemGroup>
 			<ReferencePath Remove="@(ReferencePath)" />
 			<ReferencePath Include="@(BbsReferencePathBackup)" />
@@ -233,7 +250,7 @@ foreach (var reference in References)
 
 	</Target>
 	
-	<Target Name='BbsTriggeredByCompilation'>
+	<Target Name='BbsTriggeredByCompilation' Condition="'$(BbsEnabled)'=='True'">
 		<Message Text=' * Bbs TriggeredByCompilation [BbsState = $(BbsState)]' Importance='high'/>
 		<Error Condition="'$(BbsState)'==''" Text="BBS Assertion: State unknown" />
 		<Error Condition="'$(BbsState)'=='Trial'" Text="BBS Assertion: Sorry, CoreCompile were executed but BBS state is Trial. Please contact developers." />

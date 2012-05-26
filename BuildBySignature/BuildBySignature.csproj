@@ -108,6 +108,7 @@
     </None>
     <None Include="..\BBS_Before.targets">
       <Link>BBS_Before.targets</Link>
+      <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
