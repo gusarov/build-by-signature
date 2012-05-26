@@ -2,8 +2,6 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 
-using ClassLibrary1;
-
 
 namespace Sample
 {
@@ -11,7 +9,7 @@ namespace Sample
 	{ 
 		public int MyMethod()
 		{
-			return new Class1().X();
+			return 5;
 		}
 	}
 }

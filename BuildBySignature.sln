@@ -13,9 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BbsManager", "BbsManager\Bb
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Import - MyUtils", "Import - MyUtils", "{3DF65114-50AD-489D-AC60-9A7DFE0984F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyUtils.UAC", "..\TransparentBackup\MyUtils.UAC\MyUtils.UAC.csproj", "{FDB608CF-5BB2-47B3-887D-B88A10E13E27}"
-EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup1", "Setup1\Setup1.vdproj", "{2D5BC71C-B745-46D2-B54A-5133A7DDB3D6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyUtils.UAC", "Import\MyUtils.UAC\MyUtils.UAC.csproj", "{FDB608CF-5BB2-47B3-887D-B88A10E13E27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,12 +81,6 @@ Global
 		{FDB608CF-5BB2-47B3-887D-B88A10E13E27}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{FDB608CF-5BB2-47B3-887D-B88A10E13E27}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{FDB608CF-5BB2-47B3-887D-B88A10E13E27}.Release|x86.ActiveCfg = Release|Any CPU
-		{2D5BC71C-B745-46D2-B54A-5133A7DDB3D6}.Debug|Any CPU.ActiveCfg = Debug
-		{2D5BC71C-B745-46D2-B54A-5133A7DDB3D6}.Debug|Mixed Platforms.ActiveCfg = Debug
-		{2D5BC71C-B745-46D2-B54A-5133A7DDB3D6}.Debug|x86.ActiveCfg = Debug
-		{2D5BC71C-B745-46D2-B54A-5133A7DDB3D6}.Release|Any CPU.ActiveCfg = Release
-		{2D5BC71C-B745-46D2-B54A-5133A7DDB3D6}.Release|Mixed Platforms.ActiveCfg = Release
-		{2D5BC71C-B745-46D2-B54A-5133A7DDB3D6}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
