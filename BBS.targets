@@ -1,0 +1,244 @@
+<Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003'>
+	<PropertyGroup>
+		<BbsFile>$(TargetName).bbs</BbsFile>
+		<BbsState>Initial</BbsState>
+		<!--<BbsState>Initial</BbsState>-->
+		<!--<BbsState>Trial</BbsState>-->
+		<!--<BbsState>CompileAnyway</BbsState>-->
+	</PropertyGroup>
+
+	<UsingTask AssemblyFile='BBS.DLL' TaskName='GenerateHashTask' />
+
+	<Target Name='BbsGenerateHash' AfterTargets='CopyFilesToOutputDirectory' Inputs='$(TargetPath)' Outputs='$(TargetDir)$(TargetName).bbs' >
+		<Message Text=' * Bbs GenerateHash $(TargetName)' Importance='high'/>
+		<GenerateHashTask
+			TargetPath='$(TargetPath)'
+			OutputPath='$(TargetDir)$(TargetName).bbs'
+			>
+		</GenerateHashTask>
+	</Target>
+
+	<Target Name='BbsBeforeCompile' BeforeTargets='CoreCompile' >
+		<Message Text=' * Bbs BeforeCompile [BbsState = $(BbsState)]' Importance='high'/>
+		<ItemGroup>
+			<BbsReferencePathBackup Include="@(ReferencePath)" />
+		</ItemGroup>
+	</Target>
+	
+	<Target
+	Condition="'$(BbsState)'=='Initial'"
+	Name="Bbs1CoreCompileGoingToInvalidateNotByReferencePath"
+	BeforeTargets='CoreCompile'
+	Inputs="$(MSBuildAllProjects);
+			@(Compile);                               
+			@(_CoreCompileResourceInputs);
+			$(ApplicationIcon);
+			$(AssemblyOriginatorKeyFile);
+			@(CompiledLicenseFile);
+			@(EmbeddedDocumentation); 
+			$(Win32Resource);
+			$(Win32Manifest);
+			@(CustomAdditionalCompileInputs)"
+	Outputs="@(DocFileItem);
+			 @(IntermediateAssembly);
+			 @(_DebugSymbolsIntermediatePath);                 
+			 $(NonExistentFile);
+			 @(CustomAdditionalCompileOutputs)"
+	>
+		<!-- We should compile anyway! -->
+		<Message Text=' * Bbs 1 CoreCompileGoingToInvalidateNotByReferencePath [BbsState = $(BbsState)]' Importance='high'/>
+		<!-- But set property only during task execution, prohibit Output Inference -->
+		<CreateProperty Value="CompileAnyway">
+			<Output PropertyName="BbsState" TaskParameter="ValueSetByTask" />
+		</CreateProperty>
+	</Target>
+
+	<!-- TODO Move to dll for performance reasons -->
+	<UsingTask TaskName="BbsDecide" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+		<ParameterGroup>
+			<References Required="True" ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
+			<ReferencesAlive Output="True" ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
+			<IntermediateOutputPath Required="True" />
+		</ParameterGroup>
+		<Task>
+			<Reference Include="System" />
+			<Reference Include="System.Core" />
+			<Using Namespace="System" />
+			<Using Namespace="System.IO" />
+			<Using Namespace="System.Linq" />
+			<Code Type="Fragment" Language="cs">
+				<![CDATA[
+Console.WriteLine("=> Generating truncated references list...");
+var referencesAlive = new List<ITaskItem>();
+foreach (var reference in References)
+{
+	var spec = (string)reference.ItemSpec;
+	var bssFileName = Path.Combine(Path.GetDirectoryName(spec), Path.GetFileNameWithoutExtension(spec) + ".bbs");
+	if (File.Exists(bssFileName))
+	{
+		var hash = File.ReadAllText(bssFileName);
+		Console.WriteLine("=> Hash = " + hash);
+		var bssLocalFileName = Path.Combine(IntermediateOutputPath, Path.GetFileName(bssFileName));
+		if (File.Exists(bssLocalFileName))
+		{
+			var hashOfPreviousCompilation = File.ReadAllText(bssLocalFileName);
+			Console.WriteLine("=> Local hash = " + hashOfPreviousCompilation);
+			if (hashOfPreviousCompilation == hash)
+			{
+				continue; // do not mark it alive
+			}
+		} else {
+			Console.WriteLine("=> but we have no local hash");
+		}
+	}
+	referencesAlive.Add(reference);
+}
+
+ReferencesAlive = referencesAlive.ToArray();
+			]]>
+			</Code>
+		</Task>
+	</UsingTask>
+	
+	<!-- TODO Move to dll or to targets for performance reasons -->
+	<UsingTask TaskName="BbsCopyHashes" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+		<ParameterGroup>
+			<References Required="True" ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
+			<IntermediateOutputPath Required="True" />
+		</ParameterGroup>
+		<Task>
+			<Reference Include="System" />
+			<Reference Include="System.Core" />
+			<Using Namespace="System" />
+			<Using Namespace="System.IO" />
+			<Using Namespace="System.Linq" />
+			<Code Type="Fragment" Language="cs">
+			<![CDATA[
+foreach (var reference in References)
+{
+	var spec = (string)reference.ItemSpec;
+	var bssFileName = Path.Combine(Path.GetDirectoryName(spec), Path.GetFileNameWithoutExtension(spec) + ".bbs");
+	if (File.Exists(bssFileName))
+	{
+		var bssLocalFileName = Path.Combine(IntermediateOutputPath, Path.GetFileName(bssFileName));
+		File.Copy(bssFileName, bssLocalFileName, true);
+	}
+}
+			]]>
+			</Code>
+		</Task>
+	</UsingTask>
+	
+	<Target
+	Condition="'$(BbsState)'=='Initial'"
+	Name='Bbs2CoreCompileGoingToInvalidateOnlyByReferencePath'
+	BeforeTargets='CoreCompile'
+	Inputs='@(ReferencePath)'
+	Outputs='@(DocFileItem);
+			 @(IntermediateAssembly);
+			 @(_DebugSymbolsIntermediatePath);                 
+			 $(NonExistentFile);
+			 @(CustomAdditionalCompileOutputs)'
+	>
+		<Message Text=' * Bbs 2 CoreCompileGoingToInvalidateOnlyByReferencePath [BbsState = $(BbsState)]' Importance='high'/>
+		<!-- We should make a further decisions and tricky actions! -->
+		<!-- Fight Against Output Inference -->
+		<CallTarget Targets="Bbs2Exec" />
+		<CreateProperty Value="Trial">
+			<Output PropertyName="BbsState" TaskParameter="ValueSetByTask" />
+		</CreateProperty>
+	</Target>
+
+	<Target Name="Bbs2Exec">
+		<Message Text=' * Bbs 2 Exec' Importance='high'/>
+		<!--
+			[TASK]
+			[aggregate reference paths with hashes      ]
+			[make a list with excluded identical hashes ]
+			set references to remained list
+			set BbsState to 'trial' stage
+			clear references at all // here either bowth CoreCompile and Trial will be skipped or Trial rus and restore references
+			if 'trial' target runs - set compile anyway and restore references
+		-->
+		<ItemGroup>
+			<ReferencesAlive Remove="@(ReferencesAlive)" />
+		</ItemGroup>
+		<BbsDecide References="@(ReferencePath)" IntermediateOutputPath="$(IntermediateOutputPath)">
+			<Output TaskParameter="ReferencesAlive" ItemName="ReferencesAlive"></Output>
+		</BbsDecide>
+		<ItemGroup>
+			<ReferencePath Remove="@(ReferencePath)" />
+		</ItemGroup>
+		<ItemGroup>
+			<ReferencePath Remove="@(ReferencesAlive)" />
+		</ItemGroup>
+	</Target>
+	
+	<Target Name="Bbs3Trial"
+		Condition="'$(BbsState)'=='Trial'"
+		BeforeTargets='CoreCompile' 
+		Inputs="$(MSBuildAllProjects);
+			@(Compile);                               
+			@(ReferencePath);
+			@(_CoreCompileResourceInputs);
+			$(ApplicationIcon);
+			$(AssemblyOriginatorKeyFile);
+			@(CompiledLicenseFile);
+			@(EmbeddedDocumentation); 
+			$(Win32Resource);
+			$(Win32Manifest);
+			@(CustomAdditionalCompileInputs)"
+	Outputs="@(DocFileItem);
+			 @(IntermediateAssembly);
+			 @(_DebugSymbolsIntermediatePath);                 
+			 $(NonExistentFile);
+			 @(CustomAdditionalCompileOutputs)"
+	>
+		<!-- If it is triggered - rollback immediately -->
+		<Message Text=' * Bbs 3 Trial [BbsState = $(BbsState)]' Importance='high'/>
+		<CreateProperty Value="CompileAnyway">
+			<Output PropertyName="BbsState" TaskParameter="ValueSetByTask" />
+		</CreateProperty>
+	</Target>
+	
+	<Target
+		Condition="'$(BbsState)'=='CompileAnyway'"
+		Name="Bbs4_Rollback"
+		BeforeTargets='CoreCompile'
+		>
+		<Message Text=' * Bbs 4 Rollback [BbsState = $(BbsState)]' Importance='high'/>
+		<ItemGroup>
+			<ReferencePath Remove="@(ReferencePath)" />
+			<ReferencePath Include="@(BbsReferencePathBackup)" />
+		</ItemGroup>
+	</Target>
+	
+	<Target Name='BbsAfterCompile' AfterTargets='CoreCompile' >
+		<ItemGroup>
+			<ReferencePath Remove="@(ReferencePath)" />
+			<ReferencePath Include="@(BbsReferencePathBackup)" />
+		</ItemGroup>
+	
+		<Message Text=' * Bbs AfterCompile [BbsState = $(BbsState)]' Importance='high'/>
+		<Message Text=' * Bbs AfterCompile [ReferencePath = @(ReferencePath)]' Importance='high'/>
+
+		<Message Text=' * Bbs Standard Incremental Build' Importance='high' Condition="'$(BbsState)'=='Initial'"/>
+		<Message Text=' * Bbs We Can`t Omit Core Compile Step' Importance='high' Condition="'$(BbsState)'=='CompileAnyway'"/>
+		<Message Text=' * Bbs We Have Successfully Omited Core Compile Step' Importance='high' Condition="'$(BbsState)'=='Trial'"/>
+		
+		<!--
+		<BbsCopyHashes References="@(ReferencePath)" IntermediateOutputPath="$(IntermediateOutputPath)">
+		</BbsCopyHashes>
+		-->
+
+	</Target>
+	
+	<Target Name='BbsTriggeredByCompilation'>
+		<Message Text=' * Bbs TriggeredByCompilation [BbsState = $(BbsState)]' Importance='high'/>
+		<Error Condition="'$(BbsState)'==''" Text="BBS Assertion: State unknown" />
+		<Error Condition="'$(BbsState)'=='Trial'" Text="BBS Assertion: Sorry, CoreCompile were executed but BBS state is Trial. Please contact developers." />
+		<Error Condition="'@(ReferencePath)' != '@(BbsReferencePathBackup)'" Text="BBS Assertion: Sorry, CoreCompile were executed with invalid reference list. Make sure that MSBUILD version is compatible with BBS" />
+		<BbsCopyHashes References="@(ReferencePath)" IntermediateOutputPath="$(IntermediateOutputPath)">
+		</BbsCopyHashes>
+	</Target>
+</Project>
