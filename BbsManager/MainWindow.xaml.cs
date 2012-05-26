@@ -23,5 +23,14 @@ namespace BbsManager
 		{
 			InitializeComponent();
 		}
+
+		private TrayIcon _tray = new TrayIcon();
+
+
+
+		private void Window_Closed(object sender, EventArgs e)
+		{
+
+		}
 	}
 }
