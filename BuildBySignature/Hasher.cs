@@ -23,11 +23,11 @@ namespace BuildBySignature
 		public int _ctxTypesCount;
 		bool _isInternalsVisible;
 
-//		void Hashin(ref int hash, TypeDefinition part)
-//		{
-//			Hashin(ref hash, part.AssemblyQualifiedName ?? part.FullName ?? part.ToString());
-//			// TODO somebody's generic parameter argument type... like T
-//		}
+		void Hashin(ref int hash, TypeReference part)
+		{
+			Hashin(ref hash, part.FullName ?? part.ToString());
+			// TODO somebody's generic parameter argument type... like T
+		}
 
 		void Hashin(ref int hash, object part)
 		{
