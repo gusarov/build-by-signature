@@ -14,7 +14,7 @@ namespace BuildBySignature_ConsoleTest
 		static void Main()
 		{
 			var sw = Stopwatch.StartNew();
-			var hash = Hasher.Hash(typeof(MyUtils).Assembly);
+			var hash = Hasher.Hash(typeof(MyUtils).Assembly.Location);
 			sw.Stop();
 			Console.WriteLine("0x{0:X8}", hash);
 			Console.WriteLine(sw.ElapsedMilliseconds + " ms");

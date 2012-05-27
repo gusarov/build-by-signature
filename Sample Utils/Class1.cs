@@ -2,8 +2,9 @@
 using System;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
-//[assembly: InternalsVisibleTo("abc")]
+[assembly: InternalsVisibleTo("abc")]
 
 namespace Sample
 {

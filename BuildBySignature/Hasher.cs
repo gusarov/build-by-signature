@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Runtime.CompilerServices;
+
+using Mono.Cecil;
+
+using FieldAttributes = Mono.Cecil.FieldAttributes;
+using MethodAttributes = Mono.Cecil.MethodAttributes;
+using TypeAttributes = Mono.Cecil.TypeAttributes;
 
 namespace BuildBySignature
 {
@@ -19,83 +23,93 @@ namespace BuildBySignature
 		public int _ctxTypesCount;
 		bool _isInternalsVisible;
 
-		static void Hashin(ref int hash, Type part)
-		{
-			Hashin(ref hash, part.AssemblyQualifiedName ?? part.FullName ?? part.ToString());
-			// TODO somebody's generic parameter argument type... like T
-		}
+//		void Hashin(ref int hash, TypeDefinition part)
+//		{
+//			Hashin(ref hash, part.AssemblyQualifiedName ?? part.FullName ?? part.ToString());
+//			// TODO somebody's generic parameter argument type... like T
+//		}
 
-		static void Hashin(ref int hash, object part)
+		void Hashin(ref int hash, object part)
 		{
 			Hashin(ref hash, part.GetHashCode());
 		}
 
-		static void Hashin(ref int hash, int part)
+		void Hashin(ref int hash, int part)
 		{
 			unchecked
 			{
-				hash ^= part * 397;
+				hash ^= part * _primeNumbers[_primeNumber++];
+				if (_primeNumber >= _primeNumbers.Length)
+				{
+					_primeNumber = 0;
+				}
 			}
 		}
 
-		public static int Hash(Assembly asm)
+		int _primeNumber;
+
+		static readonly int[] _primeNumbers = new[]
+		{
+			281, 283, 293, 307, 311, 313, 317, 331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397, 401, 409, 419, 421, 431, 433, 439
+		};
+		
+		public static int Hash(string assemblyFileName)
+		{
+			var asm = AssemblyDefinition.ReadAssembly(assemblyFileName);
+			return Hash(asm);
+		}
+
+		public static int Hash(AssemblyDefinition asm)
 		{
 			int hash = 0;
 			new Hasher().Hash(asm, ref hash);
 			return hash;
 		}
 
-		void Hash(Assembly asm, ref int hash)
+		void Hash(AssemblyDefinition asm, ref int hash)
 		{
-			_isInternalsVisible = asm.GetCustomAttributes(typeof(InternalsVisibleToAttribute), false).Any();
+			// _isInternalsVisible = asm.GetCustomAttributes(typeof(InternalsVisibleToAttribute), false).Any();
+			var ivtafn = typeof(InternalsVisibleToAttribute).FullName;
+			_isInternalsVisible = asm.CustomAttributes.Any(x => x.AttributeType.FullName == ivtafn);
 
-			foreach (var type in asm.GetTypes().Where(x=>x.IsPublic)) // there are some extra checking now... if we omit that we can proceed to public class nested to private... So lets make depth iteration instead of breadth
+			// there are some extra checking now... if we omit that we can proceed to public class nested to private... So lets make depth iteration instead of breadth
+			// foreach (var type in asm.GetTypes().Where(x => x.IsPublic))
+			foreach (var type in asm.Modules.SelectMany(m=>m.GetTypes().Where(t=>t.IsPublic || (_isInternalsVisible && t.IsNotPublic))))
 			{
 				Hash(type, ref hash);
 			}
 			// Console.WriteLine("0x{0:X8} - {1}", hash, asm.FullName);
 		}
 
-		void Hash(Type type, ref int hash)
+		void Hash(TypeDefinition type, ref int hash)
 		{
 			var visibility = type.Attributes & TypeAttributes.VisibilityMask;
 			if (IsVisible(visibility))
 			{
 				_ctxTypesCount++;
-				Console.WriteLine("{0}", type.FullName);
+				//Console.WriteLine("{0}", type.FullName);
 
-				foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+//				foreach (var member in type.meGetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+//				{
+//					Hash(member, ref hash);
+//				}
+
+				foreach (var methodDefinition in type.Methods)
 				{
-					Hash(member, ref hash);
+					Hash(methodDefinition, ref hash);
 				}
-			}
-		}
 
-		void Hash(MemberInfo info, ref int hash)
-		{
-			switch (info.MemberType)
-			{
-				case MemberTypes.Constructor:
-				case MemberTypes.Method:
-					_ctxMembersCount++;
-					Hash((MethodBase)info, ref hash);
-					return;
-				case MemberTypes.Field:
-					_ctxMembersCount++;
-					Hash((FieldInfo)info, ref hash);
-					return;
-				case MemberTypes.Event:
-				case MemberTypes.Property:
-					// already hashed by accessors
-					return;
-				case MemberTypes.NestedType:
-					Hash((Type)info, ref hash);
-					return;
-				case MemberTypes.TypeInfo:
-				case MemberTypes.Custom:
-				case MemberTypes.All:
-				default:
-					throw new NotSupportedException("MemberType = " + info.MemberType.ToString());
+				foreach (var fieldDefinition in type.Fields)
+				{
+					Hash(fieldDefinition, ref hash);
+				}
+
+				foreach (var nestedType in type.NestedTypes)
+				{
+					Hash(nestedType, ref hash);
+				}
+
+				// todo type generic parameters
 			}
 		}
 
@@ -109,23 +123,19 @@ namespace BuildBySignature
 		}
 #endif
 
-		void Hash(MethodBase member, ref int hash)
+		void Hash(MethodDefinition member, ref int hash)
 		{
 			var visibility = member.Attributes & MethodAttributes.MemberAccessMask;
 			if (IsVisible(visibility))
 			{
 				// Console.WriteLine("Method: {0,20} \t[{1}]", member.Name, ToStringNoFlags(visibility));
 				Hashin(ref hash, member.Name);
-				foreach (var param in member.GetParameters())
+				foreach (var param in member.Parameters)
 				{
 					Hashin(ref hash, param.ParameterType);
 				}
 
-				var mi = member as MethodInfo; // not a constructor
-				if (mi != null)
-				{
-					Hashin(ref hash, mi.ReturnType);
-				}
+				Hashin(ref hash, member.ReturnType);
 
 				// todo parameter attributes (like ref!)
 				// todo parameter custom attributes (?)
@@ -134,13 +144,12 @@ namespace BuildBySignature
 			}
 		}
 
-		// static Random _rnd = new Random();
-
-		void Hash(FieldInfo member, ref int hash)
+		void Hash(FieldDefinition member, ref int hash)
 		{
 			var visibility = member.Attributes & FieldAttributes.FieldAccessMask;
 			if (IsVisible(visibility))
 			{
+				// Console.WriteLine("Field: {0,20} \t[{1}]", member.Name, ToStringNoFlags(visibility));
 				Hashin(ref hash, member.Name);
 				Hashin(ref hash, member.FieldType);
 			}
@@ -180,7 +189,7 @@ namespace BuildBySignature
 				case MethodAttributes.Assembly:
 				case MethodAttributes.FamANDAssem:
 					return _isInternalsVisible;
-				case MethodAttributes.PrivateScope:
+				// case MethodAttributes.PrivateScope: == 0 ?
 				case MethodAttributes.Private:
 					return false;
 				default:
@@ -199,7 +208,7 @@ namespace BuildBySignature
 				case FieldAttributes.Assembly:
 				case FieldAttributes.FamANDAssem:
 					return _isInternalsVisible;
-				case FieldAttributes.PrivateScope:
+				// case FieldAttributes.PrivateScope: == 0?
 				case FieldAttributes.Private:
 					return false;
 				default:

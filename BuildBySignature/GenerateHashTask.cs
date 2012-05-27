@@ -9,7 +9,7 @@ using Microsoft.Build.Utilities;
 
 namespace BuildBySignature
 {
-	public class GenerateHashTask : AppDomainIsolatedTask
+	public class GenerateHashTask : Task
 	{
 		[Required]
 		public string TargetPath { get; set; }
@@ -19,8 +19,7 @@ namespace BuildBySignature
 
 		public override bool Execute()
 		{
-			var asm = Assembly.Load(File.ReadAllBytes(TargetPath));
-			var hash = Hasher.Hash(asm).ToString("X8");
+			var hash = Hasher.Hash(TargetPath).ToString("X8");
 			var now = "";
 			if (File.Exists(OutputPath))
 			{
