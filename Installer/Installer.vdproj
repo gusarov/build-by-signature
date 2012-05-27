@@ -21,12 +21,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_66B7FF83239456161F3C6787CA11A2A3"
-        "OwnerKey" = "8:_900A281C82E344FCB6A50F6B34C33A4B"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_900A281C82E344FCB6A50F6B34C33A4B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -41,6 +35,12 @@
         {
         "MsmKey" = "8:_D9B707A2762A4B578C31B911DA8A717C"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F4D928D71431DCBF7E1C182324014E4C"
+        "OwnerKey" = "8:_900A281C82E344FCB6A50F6B34C33A4B"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -64,7 +64,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_66B7FF83239456161F3C6787CA11A2A3"
+        "OwnerKey" = "8:_F4D928D71431DCBF7E1C182324014E4C"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -76,7 +76,7 @@
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
         "OutputFilename" = "8:Debug\\Installer.msi"
-        "PackageFilesAs" = "3:2"
+        "PackageFilesAs" = "3:1"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
         "Compression" = "3:1"
@@ -210,20 +210,6 @@
             "InstallerClass" = "11:TRUE"
             "CustomActionData" = "8:/TargetDir=\"[TARGETDIR]\\\""
             }
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_E2494D2FC66B4CCEB903CE089DB761B7"
-            {
-            "Name" = "8:Primary output from BbsManager (Active)"
-            "Condition" = "8:"
-            "Object" = "8:_900A281C82E344FCB6A50F6B34C33A4B"
-            "FileType" = "3:2"
-            "InstallAction" = "3:2"
-            "Arguments" = "8:-install"
-            "EntryPoint" = "8:"
-            "Sequence" = "3:2"
-            "Identifier" = "8:_66394B87_5C95_46DE_835D_F17A99317A22"
-            "InstallerClass" = "11:FALSE"
-            "CustomActionData" = "8:"
-            }
         }
         "DefaultFeature"
         {
@@ -267,14 +253,34 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_66B7FF83239456161F3C6787CA11A2A3"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_99A2E044AA7342C396AC30FE7F802668"
+            {
+            "SourcePath" = "8:..\\_images\\Icon.ico"
+            "TargetName" = "8:Icon.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_C93F58C414B845E68E44D2C7741DB17C"
+            "Condition" = "8:False"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F4D928D71431DCBF7E1C182324014E4C"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:MyUtils.UAC, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6594f8f5163e32e1, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_66B7FF83239456161F3C6787CA11A2A3"
+                    "_F4D928D71431DCBF7E1C182324014E4C"
                     {
                     "Name" = "8:MyUtils.UAC.exe"
                     "Attributes" = "3:512"
@@ -296,26 +302,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_99A2E044AA7342C396AC30FE7F802668"
-            {
-            "SourcePath" = "8:..\\_images\\Icon.ico"
-            "TargetName" = "8:Icon.ico"
-            "Tag" = "8:"
-            "Folder" = "8:_C93F58C414B845E68E44D2C7741DB17C"
-            "Condition" = "8:False"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F81D7780426043AFB412A26456A3C6DC"
@@ -396,7 +382,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Build By Signature"
         "ProductCode" = "8:{7634038C-13E6-4C60-9AA2-E68FF5631DDC}"
-        "PackageCode" = "8:{24E42E60-C6E8-4C37-8354-E2DB422A540A}"
+        "PackageCode" = "8:{371214EA-34FA-4F32-A5CB-2C2706C30762}"
         "UpgradeCode" = "8:{F579DFC4-BCCC-4125-9922-0057BEBBB566}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -419,7 +405,7 @@
         "UseSystemSearchPath" = "11:TRUE"
         "TargetPlatform" = "3:0"
         "PreBuildEvent" = "8:"
-        "PostBuildEvent" = "8:"
+        "PostBuildEvent" = "8:cscript.exe \"$(ProjectDir)LaunchApplication.js\" \"$(BuiltOuputPath)\""
         "RunPostBuildEvent" = "3:0"
         }
         "Registry"
@@ -804,7 +790,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_900A281C82E344FCB6A50F6B34C33A4B"
             {
-            "SourcePath" = "8:..\\BbsManager\\obj\\Release\\BbsManager.exe"
+            "SourcePath" = "8:..\\BbsManager\\obj\\Debug\\BbsManager.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_3B989A0C78B647B587504E09AD7C9064"
@@ -832,7 +818,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D9B707A2762A4B578C31B911DA8A717C"
             {
-            "SourcePath" = "8:..\\BuildBySignature\\obj\\Release\\BBS.dll"
+            "SourcePath" = "8:..\\BuildBySignature\\obj\\Debug\\BBS.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_3B989A0C78B647B587504E09AD7C9064"

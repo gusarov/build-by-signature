@@ -7,9 +7,9 @@ namespace Sample
 {
 	public class MyUtils
 	{ 
-		public long MyMethod()
+		public int MyMethod()
 		{
-			return 22;
+			return 50;
 		}
 	}
 }

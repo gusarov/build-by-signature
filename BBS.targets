@@ -6,7 +6,7 @@
 		<!--<BbsState>CompileAnyway</BbsState>-->
 	</PropertyGroup>
 
-	<Target Name='BbsDetectState' BeforeTargets='CoreCompile'>
+	<Target Name='BbsDetectState' BeforeTargets='CoreCompile;CopyFilesToOutputDirectory'>
 		<CreateProperty Value="$(registry:HKEY_CURRENT_USER\Software\Bbs@Enabled)">
 			<Output PropertyName="BbsEnabled" TaskParameter="ValueSetByTask" />
 		</CreateProperty>
@@ -26,7 +26,7 @@
 
 	<UsingTask AssemblyFile='BBS.DLL' TaskName='GenerateHashTask' />
 
-	<Target Name='BbsGenerateHash' Condition="'$(BbsEnabled)'=='True'" AfterTargets='CopyFilesToOutputDirectory;BbsDetectState' Inputs='$(TargetPath)' Outputs='$(TargetDir)$(TargetName).bbs' >
+	<Target Name='BbsGenerateHash' AfterTargets='CopyFilesToOutputDirectory' >
 		<Message Text=' * Bbs GenerateHash $(TargetName)' Importance='high'/>
 		<GenerateHashTask
 			TargetPath='$(TargetPath)'
@@ -41,13 +41,13 @@
 			<BbsReferencePathBackup Include="@(ReferencePath)" />
 		</ItemGroup>
 	</Target>
-	
+
 	<Target
 	Condition="'$(BbsState)'=='Initial'"
 	Name="Bbs1CoreCompileGoingToInvalidateNotByReferencePath"
 	BeforeTargets='CoreCompile'
 	Inputs="$(MSBuildAllProjects);
-			@(Compile);                               
+			@(Compile);
 			@(_CoreCompileResourceInputs);
 			$(ApplicationIcon);
 			$(AssemblyOriginatorKeyFile);
@@ -57,10 +57,12 @@
 			$(Win32Manifest);
 			@(CustomAdditionalCompileInputs)"
 	Outputs="@(DocFileItem);
-			 @(IntermediateAssembly);
-			 @(_DebugSymbolsIntermediatePath);                 
-			 $(NonExistentFile);
-			 @(CustomAdditionalCompileOutputs)"
+			@(IntermediateAssembly);
+			@(_DebugSymbolsIntermediatePath);
+			$(NonExistentFile);
+			@(CustomAdditionalCompileOutputs)"
+			Returns=""
+
 	>
 		<!-- We should compile anyway! -->
 		<Message Text=' * Bbs 1 CoreCompileGoingToInvalidateNotByReferencePath [BbsState = $(BbsState)]' Importance='high'/>
@@ -70,8 +72,10 @@
 		</CreateProperty>
 	</Target>
 
+	<UsingTask TaskName="BbsDecide" AssemblyFile="BBS.DLL" />
+	
 	<!-- TODO Move to dll for performance reasons -->
-	<UsingTask TaskName="BbsDecide" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+	<UsingTask TaskName="BbsDecide_" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
 		<ParameterGroup>
 			<References Required="True" ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
 			<ReferencesAlive Output="True" ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
@@ -152,10 +156,12 @@ foreach (var reference in References)
 	BeforeTargets='CoreCompile'
 	Inputs='@(ReferencePath)'
 	Outputs='@(DocFileItem);
-			 @(IntermediateAssembly);
-			 @(_DebugSymbolsIntermediatePath);                 
-			 $(NonExistentFile);
-			 @(CustomAdditionalCompileOutputs)'
+			@(IntermediateAssembly);
+			@(_DebugSymbolsIntermediatePath);
+			$(NonExistentFile);
+			@(CustomAdditionalCompileOutputs)'
+	Returns=""
+
 	>
 		<Message Text=' * Bbs 2 CoreCompileGoingToInvalidateOnlyByReferencePath [BbsState = $(BbsState)]' Importance='high'/>
 		<!-- We should make a further decisions and tricky actions! -->
@@ -187,7 +193,7 @@ foreach (var reference in References)
 			<ReferencePath Remove="@(ReferencePath)" />
 		</ItemGroup>
 		<ItemGroup>
-			<ReferencePath Remove="@(ReferencesAlive)" />
+			<ReferencePath Include="@(ReferencesAlive)" />
 		</ItemGroup>
 	</Target>
 	
@@ -195,21 +201,22 @@ foreach (var reference in References)
 		Condition="'$(BbsState)'=='Trial'"
 		BeforeTargets='CoreCompile' 
 		Inputs="$(MSBuildAllProjects);
-			@(Compile);                               
-			@(ReferencePath);
-			@(_CoreCompileResourceInputs);
-			$(ApplicationIcon);
-			$(AssemblyOriginatorKeyFile);
-			@(CompiledLicenseFile);
-			@(EmbeddedDocumentation); 
-			$(Win32Resource);
-			$(Win32Manifest);
-			@(CustomAdditionalCompileInputs)"
-	Outputs="@(DocFileItem);
-			 @(IntermediateAssembly);
-			 @(_DebugSymbolsIntermediatePath);                 
-			 $(NonExistentFile);
-			 @(CustomAdditionalCompileOutputs)"
+				@(Compile);
+				@(_CoreCompileResourceInputs);
+				$(ApplicationIcon);
+				$(AssemblyOriginatorKeyFile);
+				@(ReferencePath);
+				@(CompiledLicenseFile);
+				@(EmbeddedDocumentation); 
+				$(Win32Resource);
+				$(Win32Manifest);
+				@(CustomAdditionalCompileInputs)"
+		Outputs="@(DocFileItem);
+				@(IntermediateAssembly);
+				@(_DebugSymbolsIntermediatePath);
+				$(NonExistentFile);
+				@(CustomAdditionalCompileOutputs)"
+		Returns=""
 	>
 		<!-- If it is triggered - rollback immediately -->
 		<Message Text=' * Bbs 3 Trial [BbsState = $(BbsState)]' Importance='high'/>
