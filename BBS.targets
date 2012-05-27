@@ -72,6 +72,148 @@
 		</CreateProperty>
 	</Target>
 
+	<Target
+Condition="'$(BbsState)'=='CompileAnyway'"
+Name="Bbs1_5_MSBuildAllProjects"
+BeforeTargets='CoreCompile'
+Inputs="$(MSBuildAllProjects);"
+Outputs="@(DocFileItem);
+			@(IntermediateAssembly);
+			@(_DebugSymbolsIntermediatePath);
+			$(NonExistentFile);
+			@(CustomAdditionalCompileOutputs)"
+		Returns=""
+	>
+		<Message Text=' * Bbs 1.5 Triggered by MSBuildAllProjects = $(MSBuildAllProjects)' Importance='high'/>
+	</Target>
+	<Target
+Condition="'$(BbsState)'=='CompileAnyway'"
+Name="Bbs1_5_MSBuildAllProjects"
+BeforeTargets='CoreCompile'
+Inputs="@(Compile)"
+Outputs="@(DocFileItem);
+			@(IntermediateAssembly);
+			@(_DebugSymbolsIntermediatePath);
+			$(NonExistentFile);
+			@(CustomAdditionalCompileOutputs)"
+		Returns=""
+	>
+		<Message Text=' * Bbs 1.5 Triggered by Compile = @(Compile)' Importance='high'/>
+	</Target>
+	<Target
+Condition="'$(BbsState)'=='CompileAnyway'"
+Name="Bbs1_5_MSBuildAllProjects"
+BeforeTargets='CoreCompile'
+Inputs="@(_CoreCompileResourceInputs)"
+Outputs="@(DocFileItem);
+			@(IntermediateAssembly);
+			@(_DebugSymbolsIntermediatePath);
+			$(NonExistentFile);
+			@(CustomAdditionalCompileOutputs)"
+	Returns=""
+	>
+		<Message Text=' * Bbs 1.5 Triggered by _CoreCompileResourceInputs = @(_CoreCompileResourceInputs)' Importance='high'/>
+	</Target>
+	<Target
+Condition="'$(BbsState)'=='CompileAnyway'"
+Name="Bbs1_5_MSBuildAllProjects"
+BeforeTargets='CoreCompile'
+Inputs="$(ApplicationIcon)"
+Outputs="@(DocFileItem);
+			@(IntermediateAssembly);
+			@(_DebugSymbolsIntermediatePath);
+			$(NonExistentFile);
+			@(CustomAdditionalCompileOutputs)"
+	Returns=""
+	>
+		<Message Text=' * Bbs 1.5 Triggered by ApplicationIcon = $(ApplicationIcon)' Importance='high'/>
+	</Target>
+	<Target
+Condition="'$(BbsState)'=='CompileAnyway'"
+Name="Bbs1_5_MSBuildAllProjects"
+BeforeTargets='CoreCompile'
+Inputs="$(AssemblyOriginatorKeyFile)"
+Outputs="@(DocFileItem);
+			@(IntermediateAssembly);
+			@(_DebugSymbolsIntermediatePath);
+			$(NonExistentFile);
+			@(CustomAdditionalCompileOutputs)"
+	Returns=""
+	>
+		<Message Text=' * Bbs 1.5 Triggered by AssemblyOriginatorKeyFile = $(AssemblyOriginatorKeyFile)' Importance='high'/>
+	</Target>
+	<Target
+Condition="'$(BbsState)'=='CompileAnyway'"
+Name="Bbs1_5_MSBuildAllProjects"
+BeforeTargets='CoreCompile'
+Inputs="@(CompiledLicenseFile)"
+Outputs="@(DocFileItem);
+			@(IntermediateAssembly);
+			@(_DebugSymbolsIntermediatePath);
+			$(NonExistentFile);
+			@(CustomAdditionalCompileOutputs)"
+	Returns=""
+	>
+		<Message Text=' * Bbs 1.5 Triggered by CompiledLicenseFile = @(CompiledLicenseFile)' Importance='high'/>
+	</Target>
+	<Target
+Condition="'$(BbsState)'=='CompileAnyway'"
+Name="Bbs1_5_MSBuildAllProjects"
+BeforeTargets='CoreCompile'
+Inputs="@(EmbeddedDocumentation)"
+Outputs="@(DocFileItem);
+			@(IntermediateAssembly);
+			@(_DebugSymbolsIntermediatePath);
+			$(NonExistentFile);
+			@(CustomAdditionalCompileOutputs)"
+	Returns=""
+	>
+		<Message Text=' * Bbs 1.5 Triggered by EmbeddedDocumentation = @(EmbeddedDocumentation)' Importance='high'/>
+	</Target>
+	<Target
+Condition="'$(BbsState)'=='CompileAnyway'"
+Name="Bbs1_5_MSBuildAllProjects"
+BeforeTargets='CoreCompile'
+Inputs="$(Win32Resource)"
+Outputs="@(DocFileItem);
+			@(IntermediateAssembly);
+			@(_DebugSymbolsIntermediatePath);
+			$(NonExistentFile);
+			@(CustomAdditionalCompileOutputs)"
+	Returns=""
+	>
+		<Message Text=' * Bbs 1.5 Triggered by Win32Resource = $(Win32Resource)' Importance='high'/>
+	</Target>
+	<Target
+Condition="'$(BbsState)'=='CompileAnyway'"
+Name="Bbs1_5_MSBuildAllProjects"
+BeforeTargets='CoreCompile'
+Inputs="$(Win32Manifest)"
+Outputs="@(DocFileItem);
+			@(IntermediateAssembly);
+			@(_DebugSymbolsIntermediatePath);
+			$(NonExistentFile);
+			@(CustomAdditionalCompileOutputs)"
+	Returns=""
+	>
+		<Message Text=' * Bbs 1.5 Triggered by Win32Manifest = $(Win32Manifest)' Importance='high'/>
+	</Target>
+	<Target
+Condition="'$(BbsState)'=='CompileAnyway'"
+Name="Bbs1_5_MSBuildAllProjects"
+BeforeTargets='CoreCompile'
+Inputs="@(CustomAdditionalCompileInputs)"
+Outputs="@(DocFileItem);
+			@(IntermediateAssembly);
+			@(_DebugSymbolsIntermediatePath);
+			$(NonExistentFile);
+			@(CustomAdditionalCompileOutputs)"
+	Returns=""
+	>
+		<Message Text=' * Bbs 1.5 Triggered by CustomAdditionalCompileInputs = @(CustomAdditionalCompileInputs)' Importance='high'/>
+	</Target>
+
+
 	<UsingTask TaskName="BbsDecide" AssemblyFile="BBS.DLL" />
 	
 	<!-- TODO Move to dll for performance reasons -->
