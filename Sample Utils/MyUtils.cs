@@ -9,7 +9,7 @@ namespace Sample
 	{ 
 		public int MyMethod()
 		{
-			return 50;
+			return new MyUtils2().X();
 		}
 	}
 }

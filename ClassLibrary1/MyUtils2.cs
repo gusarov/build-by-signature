@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ClassLibrary1
+namespace Sample
 {
-	public class Class1
+	public class MyUtils2
 	{
 		public int X()
 		{
-			return 24;
+			return 28;
 		}
 	}
 }

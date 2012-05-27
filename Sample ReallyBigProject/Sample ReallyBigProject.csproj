@@ -54,7 +54,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Sample Utils\Sample Utils.csproj">
       <Project>{A60F9ED0-2BA0-41EF-A02D-1CE703879FFB}</Project>
-      <Name>Sample Util</Name>
+      <Name>Sample Utils</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
