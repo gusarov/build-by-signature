@@ -12,7 +12,6 @@ using System.Security.Principal;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
-using System.Xml.Serialization;
 
 namespace MyUtils.UAC
 {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Sample
@@ -9,7 +8,17 @@ namespace Sample
 	{
 		public int X()
 		{
-			return 28;
+			return 51;
+		}
+
+		public MyUtils2(bool q)
+		{
+			
+		}
+
+		public MyUtils2()
+		{
+			
 		}
 	}
 }

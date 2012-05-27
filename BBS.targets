@@ -258,7 +258,7 @@ foreach (var reference in References)
 	</Target>
 	
 	<Target Name='BbsTriggeredByCompilation' Condition="'$(BbsEnabled)'=='True'">
-		<Message Text=' * Bbs TriggeredByCompilation [BbsState = $(BbsState)]' Importance='high'/>
+		<Message Text=' * Bbs TriggeredByCompilation [BbsState = $(BbsState)] [$(TargetsTriggeredByCompilation)]' Importance='high'/>
 		<Error Condition="'$(BbsState)'==''" Text="BBS Assertion: State unknown" />
 		<Error Condition="'$(BbsState)'=='Trial'" Text="BBS Assertion: Sorry, CoreCompile were executed but BBS state is Trial. Please contact developers." />
 		<Error Condition="'@(ReferencePath)' != '@(BbsReferencePathBackup)'" Text="BBS Assertion: Sorry, CoreCompile were executed with invalid reference list. Make sure that MSBUILD version is compatible with BBS" />
