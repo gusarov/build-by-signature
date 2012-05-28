@@ -76,7 +76,7 @@
 Condition="'$(BbsState)'=='CompileAnyway'"
 Name="Bbs1_5_MSBuildAllProjects"
 BeforeTargets='CoreCompile'
-Inputs="$(MSBuildAllProjects);"
+Inputs="$(MSBuildAllProjects)"
 Outputs="@(DocFileItem);
 			@(IntermediateAssembly);
 			@(_DebugSymbolsIntermediatePath);
@@ -88,7 +88,7 @@ Outputs="@(DocFileItem);
 	</Target>
 	<Target
 Condition="'$(BbsState)'=='CompileAnyway'"
-Name="Bbs1_5_MSBuildAllProjects"
+Name="Bbs1_5_Compile"
 BeforeTargets='CoreCompile'
 Inputs="@(Compile)"
 Outputs="@(DocFileItem);
@@ -102,7 +102,7 @@ Outputs="@(DocFileItem);
 	</Target>
 	<Target
 Condition="'$(BbsState)'=='CompileAnyway'"
-Name="Bbs1_5_MSBuildAllProjects"
+Name="Bbs1_5__CoreCompileResourceInputs"
 BeforeTargets='CoreCompile'
 Inputs="@(_CoreCompileResourceInputs)"
 Outputs="@(DocFileItem);
@@ -116,7 +116,7 @@ Outputs="@(DocFileItem);
 	</Target>
 	<Target
 Condition="'$(BbsState)'=='CompileAnyway'"
-Name="Bbs1_5_MSBuildAllProjects"
+Name="Bbs1_5_ApplicationIcon"
 BeforeTargets='CoreCompile'
 Inputs="$(ApplicationIcon)"
 Outputs="@(DocFileItem);
@@ -130,7 +130,7 @@ Outputs="@(DocFileItem);
 	</Target>
 	<Target
 Condition="'$(BbsState)'=='CompileAnyway'"
-Name="Bbs1_5_MSBuildAllProjects"
+Name="Bbs1_5_AssemblyOriginatorKeyFile"
 BeforeTargets='CoreCompile'
 Inputs="$(AssemblyOriginatorKeyFile)"
 Outputs="@(DocFileItem);
@@ -144,7 +144,7 @@ Outputs="@(DocFileItem);
 	</Target>
 	<Target
 Condition="'$(BbsState)'=='CompileAnyway'"
-Name="Bbs1_5_MSBuildAllProjects"
+Name="Bbs1_5_CompiledLicenseFile"
 BeforeTargets='CoreCompile'
 Inputs="@(CompiledLicenseFile)"
 Outputs="@(DocFileItem);
@@ -158,7 +158,7 @@ Outputs="@(DocFileItem);
 	</Target>
 	<Target
 Condition="'$(BbsState)'=='CompileAnyway'"
-Name="Bbs1_5_MSBuildAllProjects"
+Name="Bbs1_5_EmbeddedDocumentation"
 BeforeTargets='CoreCompile'
 Inputs="@(EmbeddedDocumentation)"
 Outputs="@(DocFileItem);
@@ -172,7 +172,7 @@ Outputs="@(DocFileItem);
 	</Target>
 	<Target
 Condition="'$(BbsState)'=='CompileAnyway'"
-Name="Bbs1_5_MSBuildAllProjects"
+Name="Bbs1_5_Win32Resource"
 BeforeTargets='CoreCompile'
 Inputs="$(Win32Resource)"
 Outputs="@(DocFileItem);
@@ -186,7 +186,7 @@ Outputs="@(DocFileItem);
 	</Target>
 	<Target
 Condition="'$(BbsState)'=='CompileAnyway'"
-Name="Bbs1_5_MSBuildAllProjects"
+Name="Bbs1_5_Win32Manifest"
 BeforeTargets='CoreCompile'
 Inputs="$(Win32Manifest)"
 Outputs="@(DocFileItem);
@@ -200,7 +200,7 @@ Outputs="@(DocFileItem);
 	</Target>
 	<Target
 Condition="'$(BbsState)'=='CompileAnyway'"
-Name="Bbs1_5_MSBuildAllProjects"
+Name="Bbs1_5_CustomAdditionalCompileInputs"
 BeforeTargets='CoreCompile'
 Inputs="@(CustomAdditionalCompileInputs)"
 Outputs="@(DocFileItem);
