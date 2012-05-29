@@ -27,6 +27,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_9488E38EE0AA431D541B793D5586E664"
+        "OwnerKey" = "8:_900A281C82E344FCB6A50F6B34C33A4B"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_99A2E044AA7342C396AC30FE7F802668"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -39,8 +45,8 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_F4D928D71431DCBF7E1C182324014E4C"
-        "OwnerKey" = "8:_900A281C82E344FCB6A50F6B34C33A4B"
+        "MsmKey" = "8:_E2FF4B7ED8F82C93AC7D657BB04D7719"
+        "OwnerKey" = "8:_D9B707A2762A4B578C31B911DA8A717C"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -58,13 +64,19 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_E2FF4B7ED8F82C93AC7D657BB04D7719"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_900A281C82E344FCB6A50F6B34C33A4B"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_F4D928D71431DCBF7E1C182324014E4C"
+        "OwnerKey" = "8:_9488E38EE0AA431D541B793D5586E664"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -253,6 +265,37 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_9488E38EE0AA431D541B793D5586E664"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:MyUtils.UAC, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6594f8f5163e32e1, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_9488E38EE0AA431D541B793D5586E664"
+                    {
+                    "Name" = "8:MyUtils.UAC.exe"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:MyUtils.UAC.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_3B989A0C78B647B587504E09AD7C9064"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_99A2E044AA7342C396AC30FE7F802668"
             {
             "SourcePath" = "8:..\\_images\\Icon.ico"
@@ -273,20 +316,20 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F4D928D71431DCBF7E1C182324014E4C"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_E2FF4B7ED8F82C93AC7D657BB04D7719"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:MyUtils.UAC, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6594f8f5163e32e1, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Mono.Cecil, Version=0.9.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_F4D928D71431DCBF7E1C182324014E4C"
+                    "_E2FF4B7ED8F82C93AC7D657BB04D7719"
                     {
-                    "Name" = "8:MyUtils.UAC.exe"
+                    "Name" = "8:Mono.Cecil.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:MyUtils.UAC.exe"
+            "SourcePath" = "8:Mono.Cecil.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_3B989A0C78B647B587504E09AD7C9064"
@@ -332,7 +375,7 @@
         {
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_3B989A0C78B647B587504E09AD7C9064"
             {
-            "DefaultLocation" = "8:[ProgramFilesFolder][Manufacturer]\\[ProductName]"
+            "DefaultLocation" = "8:[ProgramFilesFolder][ProductName]"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -382,7 +425,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Build By Signature"
         "ProductCode" = "8:{7634038C-13E6-4C60-9AA2-E68FF5631DDC}"
-        "PackageCode" = "8:{371214EA-34FA-4F32-A5CB-2C2706C30762}"
+        "PackageCode" = "8:{57B71D26-FFFB-46F7-B4C2-A6170B404224}"
         "UpgradeCode" = "8:{F579DFC4-BCCC-4125-9922-0057BEBBB566}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -790,7 +833,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_900A281C82E344FCB6A50F6B34C33A4B"
             {
-            "SourcePath" = "8:..\\BbsManager\\obj\\Debug\\BbsManager.exe"
+            "SourcePath" = "8:..\\BbsManager\\obj\\Release\\BbsManager.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_3B989A0C78B647B587504E09AD7C9064"
@@ -818,7 +861,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D9B707A2762A4B578C31B911DA8A717C"
             {
-            "SourcePath" = "8:..\\BuildBySignature\\obj\\Debug\\BBS.dll"
+            "SourcePath" = "8:..\\BuildBySignature\\obj\\Release\\BBS.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_3B989A0C78B647B587504E09AD7C9064"

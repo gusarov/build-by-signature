@@ -51,7 +51,7 @@
 	</Target>
 
 	<Target Name='BbsBeforeCompile' BeforeTargets='CoreCompile' Condition="'$(BbsEnabled)'=='True'">
-		<Message Text=' * Bbs BeforeCompile [BbsState = $(BbsState)]' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
+		<Message Text=' * Bbs BeforeCompile [BbsState = $(BbsState)] [$(ProjectName)]' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
 		<ItemGroup>
 			<BbsReferencePathBackup Include="@(ReferencePath)" />
 		</ItemGroup>
@@ -362,9 +362,9 @@ foreach (var reference in References)
 		<Message Text=' * Bbs AfterCompile [BbsState = $(BbsState)]' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
 		<Message Text=' * Bbs AfterCompile [ReferencePath = @(ReferencePath)]' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
 
-		<Message Text=' * Bbs Standard Incremental Build' Importance='high' Condition="'$(BbsState)'=='Initial'"/>
-		<Message Text=' * Bbs We Can`t Omit Core Compile Step' Importance='high' Condition="'$(BbsState)'=='CompileAnyway'"/>
-		<Message Text=' * Bbs We Have Successfully Omited Core Compile Step' Importance='high' Condition="'$(BbsState)'=='Trial'"/>
+		<Message Text=' * Bbs Standard Incremental Build [$(ProjectName)]' Importance='high' Condition="'$(BbsState)'=='Initial'"/>
+		<Message Text=' * Bbs We Can`t Omit Core Compile Step [$(ProjectName)]' Importance='high' Condition="'$(BbsState)'=='CompileAnyway'"/>
+		<Message Text=' * Bbs We Have Successfully Omited Core Compile Step [$(ProjectName)]' Importance='high' Condition="'$(BbsState)'=='Trial'"/>
 		
 		<!--
 		<BbsCopyHashes References="@(ReferencePath)" IntermediateOutputPath="$(IntermediateOutputPath)">
