@@ -10,6 +10,20 @@ namespace BuildBySignature
 {
 	public class BbsDecide : Task
 	{
+		string _bbsDiagLevel;
+		MessageImportance _bbsDiagLevelEnum;
+
+		[Required]
+		public string BbsDiagLevel
+		{
+			get { return _bbsDiagLevel; }
+			set
+			{
+				_bbsDiagLevel = value;
+				_bbsDiagLevelEnum = (MessageImportance) Enum.Parse(typeof(MessageImportance), value);
+			}
+		}
+
 		[Required]
 		public ITaskItem[] References { get; set; }
 
@@ -21,7 +35,7 @@ namespace BuildBySignature
 
 		public override bool Execute()
 		{
-			Log.LogMessage(MessageImportance.High, "=> Generating truncated references list...");
+			Log.LogMessage(BbsDiagLevel, "=> Generating truncated references list...");
 			var referencesAlive = new List<ITaskItem>();
 			foreach (var reference in References)
 			{
@@ -32,25 +46,25 @@ namespace BuildBySignature
 					if (File.Exists(bssFileName))
 					{
 						var hash = File.ReadAllText(bssFileName);
-						Log.LogMessage(MessageImportance.High, "=> Hash = " + hash);
+						Log.LogMessage(_bbsDiagLevelEnum, "=> Hash = " + hash);
 						var bssLocalFileName = Path.Combine(IntermediateOutputPath, Path.GetFileName(bssFileName));
 						if (File.Exists(bssLocalFileName))
 						{
 							var hashOfPreviousCompilation = File.ReadAllText(bssLocalFileName);
-							Log.LogMessage(MessageImportance.High, "=> Local hash = " + hashOfPreviousCompilation);
+							Log.LogMessage(BbsDiagLevel, "=> Local hash = " + hashOfPreviousCompilation);
 							if (hashOfPreviousCompilation == hash)
 							{
-								Log.LogMessage(MessageImportance.High, "=> Ignore " + reference.ItemSpec);
+								Log.LogMessage(_bbsDiagLevelEnum, "=> Ignore " + reference.ItemSpec);
 								continue; // do not mark it alive
 							}
 						}
 						else
 						{
-							Log.LogMessage(MessageImportance.High, "=> but we have no local hash");
+							Log.LogMessage(BbsDiagLevel, "=> but we have no local hash");
 						}
 					}
 				}
-				Log.LogMessage(MessageImportance.High, "=> Add " + reference.ItemSpec);
+				Log.LogMessage(_bbsDiagLevelEnum, "=> Add " + reference.ItemSpec);
 				referencesAlive.Add(reference);
 			}
 
@@ -58,7 +72,7 @@ namespace BuildBySignature
 
 			foreach (var item in ReferencesAlive)
 			{
-				Log.LogMessage(MessageImportance.High, "=> Result " + item.ItemSpec);
+				Log.LogMessage(_bbsDiagLevelEnum, "=> Result " + item.ItemSpec);
 			}
 
 			return true;
