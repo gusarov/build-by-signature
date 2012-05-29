@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
@@ -19,6 +20,7 @@ namespace BbsManager
 		MenuItem _enableLmMi;
 		MenuItem _disableLmMi;
 		MenuItem _system;
+		MenuItem _diagnosticMi;
 
 		public void InitializeComponents()
 		{
@@ -36,14 +38,15 @@ namespace BbsManager
 			_menu.MenuItems.Add(new MenuItem("-"));
 			_system = new MenuItem("Options");
 			_menu.MenuItems.Add(_system);
+			_system.MenuItems.Add(_diagnosticMi = new MenuItem("Diagnostic Logging", Diagnostic_Click));
 			_system.MenuItems.Add(_defaultMi2 = new MenuItem("CurrentUser: Default ({0})", Default_Click));
 			_system.MenuItems.Add(new MenuItem("-"));
 			_enableLmMi = _system.MenuItems.Add("System-wide: Enable", SwEnable_Click);
 			_disableLmMi = _system.MenuItems.Add("System-wide: Disable", SwDisable_Click);
 			_system.MenuItems.Add(new MenuItem("-"));
 			_system.MenuItems.Add(new MenuItem("Close", Close_Click));
-			_menu.Popup += new EventHandler(_menu_Popup);
-			_system.Popup += new EventHandler(system_Popup);
+			_menu.Popup += _menu_Popup;
+			_system.Popup += system_Popup;
 
 			_icon.ContextMenu = _menu;
 		}
@@ -70,9 +73,10 @@ namespace BbsManager
 				_disableLmMi.Checked = true;
 				_disableLmMi.Enabled = false;
 			}
+			_diagnosticMi.Checked = _vm.IsDiagnostic;
 		}
 
-		TrayIconViewModel _vm = new TrayIconViewModel();
+		readonly TrayIconViewModel _vm = new TrayIconViewModel();
 
 		void _menu_Popup(object sender, EventArgs e)
 		{
@@ -120,6 +124,11 @@ namespace BbsManager
 				}
 				return null;
 			}
+		}
+
+		void Diagnostic_Click(object sender, EventArgs eventArgs)
+		{
+			_vm.IsDiagnostic = !_vm.IsDiagnostic;
 		}
 
 		void SwEnable_Click(object sender, EventArgs eventArgs)
@@ -174,8 +183,8 @@ namespace BbsManager
 			}
 			set
 			{
-				Registry.SetValue(@"HKEY_CURRENT_USER\Software\Bbs", "Enabled", value == null ? string.Empty : value.ToString());
-				Registry.SetValue(@"HKEY_CURRENT_USER\Software\Wow6432Node\Bbs", "Enabled", value == null ? string.Empty : value.ToString());
+				Registry.SetValue(@"HKEY_CURRENT_USER\Software\Bbs", "Enabled", value == null ? string.Empty : value.Value.ToString(CultureInfo.InvariantCulture));
+				Registry.SetValue(@"HKEY_CURRENT_USER\Software\Wow6432Node\Bbs", "Enabled", value == null ? string.Empty : value.Value.ToString(CultureInfo.InvariantCulture));
 			}
 		}
 
@@ -188,8 +197,21 @@ namespace BbsManager
 			}
 			set
 			{
-				Registry.SetValue(@"HKEY_LOCAL_MACHINE\Software\Bbs", "Enabled", value.ToString());
-				Registry.SetValue(@"HKEY_LOCAL_MACHINE\Software\Wow6432Node\Bbs", "Enabled", value.ToString());
+				Registry.SetValue(@"HKEY_LOCAL_MACHINE\Software\Bbs", "Enabled", value.ToString(CultureInfo.InvariantCulture));
+				Registry.SetValue(@"HKEY_LOCAL_MACHINE\Software\Wow6432Node\Bbs", "Enabled", value.ToString(CultureInfo.InvariantCulture));
+			}
+		}
+
+		public bool IsDiagnostic
+		{
+			get
+			{
+				var value = (string)Registry.GetValue(@"HKEY_CURRENT_USER\Software\Bbs", "Diagnostic", null);
+				return string.IsNullOrEmpty(value) ? default(bool) : bool.Parse(value);
+			}
+			set
+			{
+				Registry.SetValue(@"HKEY_CURRENT_USER\Software\Bbs", "Diagnostic", value.ToString(CultureInfo.InvariantCulture));
 			}
 		}
 	}
