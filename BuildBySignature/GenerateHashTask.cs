@@ -19,21 +19,13 @@ namespace BuildBySignature
 
 		public override bool Execute()
 		{
-			var hash = Hasher.Hash(TargetPath).ToString("X8");
-			var now = "";
+			var hash = Hasher.Hash(TargetPath, Log).ToString("X8");
 			if (File.Exists(OutputPath))
 			{
-				now = File.ReadAllText(OutputPath);
+				File.SetAttributes(OutputPath, FileAttributes.Normal);
 			}
-			if (now != hash)
-			{
-				if (File.Exists(OutputPath))
-				{
-					File.SetAttributes(OutputPath, FileAttributes.Normal);
-				}
-				File.WriteAllText(OutputPath, hash);
-				File.SetAttributes(OutputPath, FileAttributes.Normal | FileAttributes.Hidden);
-			}
+			File.WriteAllText(OutputPath, hash); // we can not omit owerwriting here even on the same data because we should be abel to distinguish a fact that hash is up to date (not disabled)
+			File.SetAttributes(OutputPath, FileAttributes.Normal | FileAttributes.Hidden);
 			return true;
 		}
 

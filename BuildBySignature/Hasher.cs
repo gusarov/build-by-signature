@@ -1,22 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
+
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 
 using Mono.Cecil;
 
-using FieldAttributes = Mono.Cecil.FieldAttributes;
-using MethodAttributes = Mono.Cecil.MethodAttributes;
-using TypeAttributes = Mono.Cecil.TypeAttributes;
-
 namespace BuildBySignature
 {
-	public class Hasher
+	public class Hasher : IDisposable
 	{
-		Hasher()
-		{
+		readonly TaskLoggingHelper _log;
 
+		[Conditional("DEBUG")]
+		void Log(string message)
+		{
+//			if (_log != null)
+//			{
+//				_log.LogMessage(MessageImportance.High, " hasher | " + message);
+//			}
+#if DEBUG
+			_logStream.WriteLine(message);
+#endif
+		}
+
+#if DEBUG
+		string _logName;
+		StreamWriter _logStream;
+#endif
+
+		Hasher(TaskLoggingHelper log = null, string fileName = null)
+		{
+			_log = log;
+#if DEBUG
+			_logName = Path.Combine(Path.GetTempPath(), "hasher " + fileName + ".log");
+			_logStream = new StreamWriter(_logName);
+#endif
 		}
 
 		public int _ctxMembersCount;
@@ -25,12 +48,15 @@ namespace BuildBySignature
 
 		void Hashin(ref int hash, TypeReference part)
 		{
-			Hashin(ref hash, part.FullName ?? part.ToString());
+			var hashBy = part.FullName ?? part.ToString();
+			Log("TypeReference");
+			Hashin(ref hash, hashBy);
 			// TODO somebody's generic parameter argument type... like T
 		}
 
-		void Hashin(ref int hash, object part)
+		void Hashin(ref int hash, string part)
 		{
+			Log("String " + part);
 			Hashin(ref hash, part.GetHashCode());
 		}
 
@@ -53,16 +79,19 @@ namespace BuildBySignature
 			281, 283, 293, 307, 311, 313, 317, 331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397, 401, 409, 419, 421, 431, 433, 439
 		};
 		
-		public static int Hash(string assemblyFileName)
+		public static int Hash(string assemblyFileName, TaskLoggingHelper log = null)
 		{
 			var asm = AssemblyDefinition.ReadAssembly(assemblyFileName);
-			return Hash(asm);
+			return Hash(asm, log, Path.GetFileName(assemblyFileName));
 		}
 
-		public static int Hash(AssemblyDefinition asm)
+		public static int Hash(AssemblyDefinition asm, TaskLoggingHelper log = null, string fileName = null)
 		{
 			int hash = 0;
-			new Hasher().Hash(asm, ref hash);
+			using (var h = new Hasher(log, fileName))
+			{
+				h.Hash(asm, ref hash);
+			}
 			return hash;
 		}
 
@@ -84,9 +113,10 @@ namespace BuildBySignature
 		void Hash(TypeDefinition type, ref int hash)
 		{
 			var visibility = type.Attributes & TypeAttributes.VisibilityMask;
-			if (IsVisible(visibility))
+			if (IsVisible(visibility) && IsVisible(type))
 			{
 				_ctxTypesCount++;
+				Log("Type " + type.FullName);
 				//Console.WriteLine("{0}", type.FullName);
 
 //				foreach (var member in type.meGetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
@@ -128,6 +158,7 @@ namespace BuildBySignature
 			var visibility = member.Attributes & MethodAttributes.MemberAccessMask;
 			if (IsVisible(visibility))
 			{
+				Log("Method " + member.Name);
 				// Console.WriteLine("Method: {0,20} \t[{1}]", member.Name, ToStringNoFlags(visibility));
 				Hashin(ref hash, member.Name);
 				foreach (var param in member.Parameters)
@@ -149,6 +180,7 @@ namespace BuildBySignature
 			var visibility = member.Attributes & FieldAttributes.FieldAccessMask;
 			if (IsVisible(visibility))
 			{
+				Log("Field " + member.Name);
 				// Console.WriteLine("Field: {0,20} \t[{1}]", member.Name, ToStringNoFlags(visibility));
 				Hashin(ref hash, member.Name);
 				Hashin(ref hash, member.FieldType);
@@ -214,6 +246,18 @@ namespace BuildBySignature
 				default:
 					throw new ArgumentOutOfRangeException("visibility");
 			}
+		}
+
+		bool IsVisible(TypeDefinition type)
+		{
+			return !type.FullName.Contains("<PrivateImplementationDetails>");
+		}
+
+		public void Dispose()
+		{
+#if DEBUG
+			_logStream.Dispose();
+#endif
 		}
 	}
 }
