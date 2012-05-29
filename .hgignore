@@ -1,0 +1,14 @@
+syntax: glob
+_bin/
+bin/
+obj/
+_ReSharper.*/
+TestResults/
+Debug/
+Release/
+*.user
+*.suo
+*.sdf
+*.psess
+*.vsp
+*.vs10x
