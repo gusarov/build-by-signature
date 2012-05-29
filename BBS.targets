@@ -7,7 +7,7 @@
 	</PropertyGroup>
 
 	<Target Name='BbsDetectDiagnostic' BeforeTargets='BbsDetectState'>
-		<PropertyGroup>
+		<PropertyGroup Condition="'$(BbsDiag)'==''">
 			<BbsDiag>$(registry:HKEY_CURRENT_USER\Software\Bbs@Diagnostic)</BbsDiag>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(BbsDiag)'==''">
@@ -22,7 +22,7 @@
 	</Target>
 
 	<Target Name='BbsDetectState' BeforeTargets='CoreCompile;CopyFilesToOutputDirectory'>
-		<PropertyGroup>
+		<PropertyGroup Condition="'$(BbsEnabled)'==''">
 			<BbsEnabled>$(registry:HKEY_CURRENT_USER\Software\Bbs@Enabled)</BbsEnabled>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(BbsEnabled)'==''">
@@ -55,6 +55,9 @@
 		<ItemGroup>
 			<BbsReferencePathBackup Include="@(ReferencePath)" />
 		</ItemGroup>
+		<PropertyGroup>
+			<NonExistentFileBak>$(NonExistentFile)</NonExistentFileBak>
+		</PropertyGroup>
 	</Target>
 
 	<Target
@@ -73,8 +76,7 @@
 			@(CustomAdditionalCompileInputs)"
 	Outputs="@(DocFileItem);
 			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);
-			$(NonExistentFile);
+			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
 			@(CustomAdditionalCompileOutputs)"
 			Returns=""
 
@@ -85,7 +87,6 @@
 		<Message Text=' * Bbs 1 out DocFileItem = @(DocFileItem)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
 		<Message Text=' * Bbs 1 out IntermediateAssembly = @(IntermediateAssembly)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
 		<Message Text=' * Bbs 1 out _DebugSymbolsIntermediatePath = @(_DebugSymbolsIntermediatePath)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-		<Message Text=' * Bbs 1 out NonExistentFile = $(NonExistentFile)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
 		<Message Text=' * Bbs 1 out CustomAdditionalCompileOutputs = @(CustomAdditionalCompileOutputs)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
 		<!-- But set property only during task execution, prohibit Output Inference -->
 		<CreateProperty Value="CompileAnyway">
@@ -100,8 +101,7 @@
 		Inputs="$(MSBuildAllProjects)"
 		Outputs="@(DocFileItem);
 			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);
-			$(NonExistentFile);
+			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
 			@(CustomAdditionalCompileOutputs)"
 		Returns=""
 	>
@@ -119,8 +119,7 @@
 		Inputs="@(Compile)"
 		Outputs="@(DocFileItem);
 			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);
-			$(NonExistentFile);
+			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
 			@(CustomAdditionalCompileOutputs)"
 		Returns=""
 	>
@@ -133,8 +132,7 @@
 		Inputs="@(_CoreCompileResourceInputs)"
 		Outputs="@(DocFileItem);
 			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);
-			$(NonExistentFile);
+			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
 			@(CustomAdditionalCompileOutputs)"
 		Returns=""
 	>
@@ -147,8 +145,7 @@
 		Inputs="$(ApplicationIcon)"
 		Outputs="@(DocFileItem);
 			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);
-			$(NonExistentFile);
+			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
 			@(CustomAdditionalCompileOutputs)"
 		Returns=""
 	>
@@ -161,8 +158,7 @@
 		Inputs="$(AssemblyOriginatorKeyFile)"
 		Outputs="@(DocFileItem);
 			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);
-			$(NonExistentFile);
+			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
 			@(CustomAdditionalCompileOutputs)"
 		Returns=""
 	>
@@ -175,8 +171,7 @@
 		Inputs="@(CompiledLicenseFile)"
 		Outputs="@(DocFileItem);
 			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);
-			$(NonExistentFile);
+			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
 			@(CustomAdditionalCompileOutputs)"
 		Returns=""
 	>
@@ -189,8 +184,7 @@
 		Inputs="@(EmbeddedDocumentation)"
 		Outputs="@(DocFileItem);
 			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);
-			$(NonExistentFile);
+			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
 			@(CustomAdditionalCompileOutputs)"
 		Returns=""
 	>
@@ -203,8 +197,7 @@
 		Inputs="$(Win32Resource)"
 		Outputs="@(DocFileItem);
 			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);
-			$(NonExistentFile);
+			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
 			@(CustomAdditionalCompileOutputs)"
 		Returns=""
 	>
@@ -217,8 +210,7 @@
 		Inputs="$(Win32Manifest)"
 		Outputs="@(DocFileItem);
 			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);
-			$(NonExistentFile);
+			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
 			@(CustomAdditionalCompileOutputs)"
 		Returns=""
 	>
@@ -231,14 +223,13 @@
 		Inputs="@(CustomAdditionalCompileInputs)"
 		Outputs="@(DocFileItem);
 			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);
-			$(NonExistentFile);
+			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
 			@(CustomAdditionalCompileOutputs)"
 		Returns=""
 	>
-		<Message Text=' * Bbs 1.5 Triggered by CustomAdditionalCompileInputs = @(CustomAdditionalCompileInputs)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-	</Target>
 
+	<Message Text=' * Bbs 1.5 Triggered by CustomAdditionalCompileInputs = @(CustomAdditionalCompileInputs)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
+	</Target>
 
 	<UsingTask TaskName="BbsDecide" AssemblyFile="BBS.DLL" />
 
@@ -278,8 +269,7 @@ foreach (var reference in References)
 	Inputs='@(ReferencePath)'
 	Outputs='@(DocFileItem);
 			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);
-			$(NonExistentFile);
+			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
 			@(CustomAdditionalCompileOutputs)'
 	Returns=""
 
@@ -316,6 +306,9 @@ foreach (var reference in References)
 		<ItemGroup>
 			<ReferencePath Include="@(ReferencesAlive)" />
 		</ItemGroup>
+		<PropertyGroup>
+			<NonExistentFile></NonExistentFile>
+		</PropertyGroup>
 	</Target>
 	
 	<Target Name="Bbs3Trial"
@@ -334,8 +327,7 @@ foreach (var reference in References)
 				@(CustomAdditionalCompileInputs)"
 		Outputs="@(DocFileItem);
 				@(IntermediateAssembly);
-				@(_DebugSymbolsIntermediatePath);
-				$(NonExistentFile);
+				@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
 				@(CustomAdditionalCompileOutputs)"
 		Returns=""
 	>
@@ -356,6 +348,9 @@ foreach (var reference in References)
 			<ReferencePath Remove="@(ReferencePath)" />
 			<ReferencePath Include="@(BbsReferencePathBackup)" />
 		</ItemGroup>
+		<PropertyGroup>
+			<NonExistentFile>$(NonExistentFileBak)</NonExistentFile>
+		</PropertyGroup>
 	</Target>
 	
 	<Target Name='BbsAfterCompile' AfterTargets='CoreCompile' Condition="'$(BbsEnabled)'=='True'">
@@ -379,21 +374,19 @@ foreach (var reference in References)
 	</Target>
 
 	<Target Name='BbsTriggeredByCompilation' Condition="'$(BbsEnabled)'=='True'">
+		<!--
 		<Message Text=' * Bbs TriggeredByCompilation [BbsState = $(BbsState)] [$(TargetsTriggeredByCompilation)]' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
 		<Error Condition="'$(BbsState)'==''" Text="BBS Assertion: State unknown" />
 		<Error Condition="'$(BbsState)'=='Trial'" Text="BBS Assertion: Sorry, CoreCompile were executed but BBS state is Trial. Please contact developers." />
 		<Error Condition="'@(ReferencePath)' != '@(BbsReferencePathBackup)'" Text="BBS Assertion: Sorry, CoreCompile were executed with invalid reference list. Make sure that MSBUILD version is compatible with BBS" />
 		<BbsCopyHashes References="@(ReferencePath)" IntermediateOutputPath="$(IntermediateOutputPath)">
 		</BbsCopyHashes>
+	-->
 	</Target>
 	
-	<!--
-	<Target Name='BbsCopyHashesAfterCoreCompile' Condition="'$(BbsEnabled)'=='True'" AfterTargets="CoreCompile"
-			Input="@(ReferencePath)"
-			>
+	<Target Name='BbsCopyHashesAfterCoreCompile' Condition="'$(BbsEnabled)'=='True'" AfterTargets="CoreCompile" >
 		<Message Text=' * Bbs BbsCopyHashesAfterCoreCompile [BbsState = $(BbsState)]' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
 		<BbsCopyHashes References="@(ReferencePath)" IntermediateOutputPath="$(IntermediateOutputPath)">
 		</BbsCopyHashes>
 	</Target>
-	-->
 </Project>
