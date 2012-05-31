@@ -2,10 +2,16 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample ReallyBigProject", "Sample ReallyBigProject\Sample ReallyBigProject.csproj", "{2A4FA811-A56C-463E-9868-04686746F9B8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B1DA0D7F-C59D-4545-896F-D06E4B88E5E1} = {B1DA0D7F-C59D-4545-896F-D06E4B88E5E1}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample Utils2", "ClassLibrary1\Sample Utils2.csproj", "{B1DA0D7F-C59D-4545-896F-D06E4B88E5E1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample Utils", "Sample Utils\Sample Utils.csproj", "{A60F9ED0-2BA0-41EF-A02D-1CE703879FFB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B1DA0D7F-C59D-4545-896F-D06E4B88E5E1} = {B1DA0D7F-C59D-4545-896F-D06E4B88E5E1}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
