@@ -49,6 +49,17 @@
 			>
 		</GenerateHashTask>
 	</Target>
+	
+	<!-- optimized for partial build -->
+	<Target Name='BbsHashReferences' BeforeTargets='CoreCompile' Inputs='@(ReferencePath)' Outputs="@(ReferencePath->'%(RootDir)%(Directory)%(Filename).bbs')" >
+		<Message Text=' * Bbs GenerateHash for reference %(ReferencePath.Filename)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
+		<GenerateHashTask
+			Condition="$([System.String]::new('%(ReferencePath.Identity)').StartsWith('$(SolutionDir)', System.StringComparison.OrdinalIgnoreCase))"
+			TargetPath='%(ReferencePath.Identity)'
+			OutputPath='%(ReferencePath.RootDir)%(ReferencePath.Directory)%(ReferencePath.Filename).bbs'
+			>
+		</GenerateHashTask>
+	</Target>
 
 	<Target Name='BbsBeforeCompile' BeforeTargets='CoreCompile' Condition="'$(BbsEnabled)'=='True'">
 		<Message Text=' * Bbs BeforeCompile [BbsState = $(BbsState)] [$(ProjectName)]' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />

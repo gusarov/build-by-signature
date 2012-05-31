@@ -7,7 +7,7 @@ namespace ReallyBigProject
 	{
 		static void Main()
 		{
-			Console.WriteLine(new Sample.MyUtils().MyMethod());
+			Console.WriteLine(new Sample.MyUtils2().X());
 		}
 	}
 }
