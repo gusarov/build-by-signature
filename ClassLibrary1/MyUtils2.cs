@@ -8,7 +8,7 @@ namespace Sample
 	{
 		public int X()
 		{
-			return 67;
+			return 70;
 		}
 
 		public MyUtils2(bool q)
