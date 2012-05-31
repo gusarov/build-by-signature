@@ -58,6 +58,9 @@
 		<PropertyGroup>
 			<NonExistentFileBak>$(NonExistentFile)</NonExistentFileBak>
 		</PropertyGroup>
+		<PropertyGroup>
+			<NonExistentFile></NonExistentFile>
+		</PropertyGroup>
 	</Target>
 
 	<Target
