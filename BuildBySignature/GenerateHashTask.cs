@@ -34,7 +34,7 @@ namespace BuildBySignature
 			}
 			if (string.Equals(hash, currentHash) && RevertTargetStamp && !string.IsNullOrEmpty(currentStamp))
 			{
-				File.SetLastWriteTimeUtc(TargetPath, DateTime.ParseExact(currentStamp, "o", CultureInfo.InvariantCulture));
+				File.SetLastWriteTimeUtc(TargetPath, DateTime.ParseExact(currentStamp, "o", CultureInfo.InvariantCulture).ToUniversalTime());
 				Log.LogMessage(MessageImportance.High, " * Bbs GenerateHashTask: Target LastWriteTime Reverted! {0}", Path.GetFileName(TargetPath));
 			}
 			// we can not omit owerwriting here even on the same data because we should be abel to distinguish a fact that hash is up to date (not disabled) for incremental build
