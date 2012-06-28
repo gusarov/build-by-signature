@@ -31,7 +31,6 @@
 
 	<Target Name='BbsGenerateHash' AfterTargets='CopyFilesToOutputDirectory' Inputs='$(TargetPath)' Outputs='$(TargetPath).bbs' Condition="$(BbsEnabled)">
 		<Message Text=' * Bbs GenerateHash $(TargetName)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-		<Message Text=' * Bbs State = $(BbsEnabled)' Importance="High" />
 		<GenerateHashTask
 			ContinueOnError="True"
 			RevertTargetStamp="True"
