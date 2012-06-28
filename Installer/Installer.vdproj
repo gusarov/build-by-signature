@@ -27,14 +27,14 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_9488E38EE0AA431D541B793D5586E664"
-        "OwnerKey" = "8:_900A281C82E344FCB6A50F6B34C33A4B"
+        "MsmKey" = "8:_99A2E044AA7342C396AC30FE7F802668"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_99A2E044AA7342C396AC30FE7F802668"
-        "OwnerKey" = "8:_UNDEFINED"
+        "MsmKey" = "8:_9FF9C17E374DD9D9E973A51836E5B78C"
+        "OwnerKey" = "8:_900A281C82E344FCB6A50F6B34C33A4B"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -45,14 +45,8 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_E2FF4B7ED8F82C93AC7D657BB04D7719"
+        "MsmKey" = "8:_DD693E3F40E6F60F2714870575F17579"
         "OwnerKey" = "8:_D9B707A2762A4B578C31B911DA8A717C"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F81D7780426043AFB412A26456A3C6DC"
-        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -64,7 +58,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_E2FF4B7ED8F82C93AC7D657BB04D7719"
+        "OwnerKey" = "8:_DD693E3F40E6F60F2714870575F17579"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -76,7 +70,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_9488E38EE0AA431D541B793D5586E664"
+        "OwnerKey" = "8:_9FF9C17E374DD9D9E973A51836E5B78C"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -136,7 +130,7 @@
         "InstallerBootstrapper" = "3:2"
             "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
             {
-            "Enabled" = "11:FALSE"
+            "Enabled" = "11:TRUE"
             "PromptEnabled" = "11:TRUE"
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
@@ -152,11 +146,6 @@
                     {
                     "Name" = "8:Microsoft .NET Framework 4 Client Profile (x86 and x64)"
                     "ProductCode" = "8:.NETFramework,Version=v4.0,Profile=Client"
-                    }
-                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
-                    {
-                    "Name" = "8:Windows Installer 3.1"
-                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
                     }
                 }
             }
@@ -265,14 +254,34 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_9488E38EE0AA431D541B793D5586E664"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_99A2E044AA7342C396AC30FE7F802668"
+            {
+            "SourcePath" = "8:..\\_images\\Icon.ico"
+            "TargetName" = "8:Icon.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_C93F58C414B845E68E44D2C7741DB17C"
+            "Condition" = "8:False"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_9FF9C17E374DD9D9E973A51836E5B78C"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:MyUtils.UAC, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6594f8f5163e32e1, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:MyUtils.UAC, Version=0.0.0.0, Culture=neutral, PublicKeyToken=6594f8f5163e32e1, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_9488E38EE0AA431D541B793D5586E664"
+                    "_9FF9C17E374DD9D9E973A51836E5B78C"
                     {
                     "Name" = "8:MyUtils.UAC.exe"
                     "Attributes" = "3:512"
@@ -296,34 +305,14 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_99A2E044AA7342C396AC30FE7F802668"
-            {
-            "SourcePath" = "8:..\\_images\\Icon.ico"
-            "TargetName" = "8:Icon.ico"
-            "Tag" = "8:"
-            "Folder" = "8:_C93F58C414B845E68E44D2C7741DB17C"
-            "Condition" = "8:False"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_E2FF4B7ED8F82C93AC7D657BB04D7719"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_DD693E3F40E6F60F2714870575F17579"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:Mono.Cecil, Version=0.9.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_E2FF4B7ED8F82C93AC7D657BB04D7719"
+                    "_DD693E3F40E6F60F2714870575F17579"
                     {
                     "Name" = "8:Mono.Cecil.dll"
                     "Attributes" = "3:512"
@@ -345,26 +334,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F81D7780426043AFB412A26456A3C6DC"
-            {
-            "SourcePath" = "8:..\\BBS_Before.targets"
-            "TargetName" = "8:BBS_Before.targets"
-            "Tag" = "8:"
-            "Folder" = "8:_3B989A0C78B647B587504E09AD7C9064"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
         }
@@ -424,15 +393,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Build By Signature"
-        "ProductCode" = "8:{7634038C-13E6-4C60-9AA2-E68FF5631DDC}"
-        "PackageCode" = "8:{57B71D26-FFFB-46F7-B4C2-A6170B404224}"
-        "UpgradeCode" = "8:{F579DFC4-BCCC-4125-9922-0057BEBBB566}"
+        "ProductCode" = "8:{E7DD451A-50D0-4E2A-BCC0-09545767D8D5}"
+        "PackageCode" = "8:{230C81E4-65F0-49B1-A12A-28683AE15FB8}"
+        "UpgradeCode" = "8:{F579DFC4-BCCC-4125-9922-0057BEBBB567}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.0.0"
+        "ProductVersion" = "8:1.1.0"
         "Manufacturer" = "8:Dmitry Gusarov"
         "ARPHELPTELEPHONE" = "8:+79046413239"
         "ARPHELPLINK" = "8:http://code.google.com/p/build-by-signature/"

@@ -57,10 +57,6 @@
       <Project>{CA2D3B02-0E14-467E-A30B-A94E621F6A8C}</Project>
       <Name>BuildBySignature</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Sample Utils\Sample Utils.csproj">
-      <Project>{A60F9ED0-2BA0-41EF-A02D-1CE703879FFB}</Project>
-      <Name>Sample Utils</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
