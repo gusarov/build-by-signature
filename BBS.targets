@@ -1,12 +1,6 @@
 <Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003'>
-	<PropertyGroup>
-		<BbsFile>$(TargetName).bbs</BbsFile>
-		<!--<BbsState>Initial</BbsState>-->
-		<!--<BbsState>Trial</BbsState>-->
-		<!--<BbsState>CompileAnyway</BbsState>-->
-	</PropertyGroup>
 
-	<Target Name='BbsDetectDiagnostic' BeforeTargets='BbsDetectState'>
+	<Target Name='BbsDetectDiagnostic' AfterTargets='CopyFilesToOutputDirectory'>
 		<PropertyGroup Condition="'$(BbsDiag)'==''">
 			<BbsDiag>$(registry:HKEY_CURRENT_USER\Software\Bbs@Diagnostic)</BbsDiag>
 		</PropertyGroup>
@@ -21,7 +15,7 @@
 		</PropertyGroup>
 	</Target>
 
-	<Target Name='BbsDetectState' BeforeTargets='CoreCompile;CopyFilesToOutputDirectory'>
+	<Target Name='BbsDetectState' AfterTargets='CopyFilesToOutputDirectory'>
 		<PropertyGroup Condition="'$(BbsEnabled)'==''">
 			<BbsEnabled>$(registry:HKEY_CURRENT_USER\Software\Bbs@Enabled)</BbsEnabled>
 		</PropertyGroup>
@@ -31,227 +25,38 @@
 		<PropertyGroup Condition="'$(BbsEnabled)'==''">
 			<BbsEnabled>False</BbsEnabled>
 		</PropertyGroup>
-		
-		<Message Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" Text=" * Bbs Enabled = $(BbsEnabled)" />
-
-		<PropertyGroup Condition="$(BbsEnabled)">
-			<BbsState>Initial</BbsState>
-		</PropertyGroup>
 	</Target>
 
 	<UsingTask AssemblyFile='BBS.DLL' TaskName='GenerateHashTask' />
 
-	<Target Name='BbsGenerateHash' AfterTargets='CopyFilesToOutputDirectory' Inputs='$(TargetPath)' Outputs='$(TargetDir)$(TargetName).bbs' >
+	<Target Name='BbsGenerateHash' AfterTargets='CopyFilesToOutputDirectory' Inputs='$(TargetPath)' Outputs='$(TargetPath).bbs' Condition="$(BbsEnabled)">
 		<Message Text=' * Bbs GenerateHash $(TargetName)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
 		<GenerateHashTask
+			RevertTargetStamp="True"
 			TargetPath='$(TargetPath)'
-			OutputPath='$(TargetDir)$(TargetName).bbs'
+			OutputPath='$(TargetPath).bbs'
 			>
 		</GenerateHashTask>
 	</Target>
 	
-	<!-- optimized for partial build -->
-	<Target Name='BbsHashReferences' BeforeTargets='CoreCompile' Inputs='@(ReferencePath)' Outputs="@(ReferencePath->'%(RootDir)%(Directory)%(Filename).bbs')" >
-		<Message Text=' * Bbs GenerateHash for reference %(ReferencePath.Filename)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-		<GenerateHashTask
-			Condition="$([System.String]::new('%(ReferencePath.Identity)').StartsWith('$(SolutionDir)', System.StringComparison.OrdinalIgnoreCase))"
-			TargetPath='%(ReferencePath.Identity)'
-			OutputPath='%(ReferencePath.RootDir)%(ReferencePath.Directory)%(ReferencePath.Filename).bbs'
-			>
-		</GenerateHashTask>
-	</Target>
-
-	<Target Name='BbsBeforeCompile' BeforeTargets='CoreCompile' Condition="'$(BbsEnabled)'=='True'">
-		<Message Text=' * Bbs BeforeCompile [BbsState = $(BbsState)] [$(ProjectName)]' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
+	<!--
+	<Target Name='BbsGenerateCopyLocalReference' AfterTargets='CopyFilesToOutputDirectory' Condition="$(BbsEnabled)">
 		<ItemGroup>
-			<BbsReferencePathBackup Include="@(ReferencePath)" />
+			<BbsReferenceCopyLocalPaths Remove='@BbsReferenceCopyLocalPaths' />
+			<BbsReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths->'%(Identity).bbs')">
+				<OriginalFile>%(Identity)</OriginalFile>
+				<OriginalFilename>%(Filename)</OriginalFilename>
+				<OriginalExtension>%(Extension)</OriginalExtension>
+			</BbsReferenceCopyLocalPaths>
 		</ItemGroup>
-		<PropertyGroup>
-			<NonExistentFileBak>$(NonExistentFile)</NonExistentFileBak>
-		</PropertyGroup>
-		<PropertyGroup>
-			<NonExistentFile></NonExistentFile>
-		</PropertyGroup>
 	</Target>
-
-	<Target
-	Condition="'$(BbsState)'=='Initial'"
-	Name="Bbs1CoreCompileGoingToInvalidateNotByReferencePath"
-	BeforeTargets='CoreCompile'
-	Inputs="$(MSBuildAllProjects);
-			@(Compile);
-			@(_CoreCompileResourceInputs);
-			$(ApplicationIcon);
-			$(AssemblyOriginatorKeyFile);
-			@(CompiledLicenseFile);
-			@(EmbeddedDocumentation); 
-			$(Win32Resource);
-			$(Win32Manifest);
-			@(CustomAdditionalCompileInputs)"
-	Outputs="@(DocFileItem);
-			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
-			@(CustomAdditionalCompileOutputs)"
-			Returns=""
-
-	>
-		<!-- We should compile anyway! -->
-		<Message Text=' * Bbs 1 CoreCompileGoingToInvalidateNotByReferencePath [BbsState = $(BbsState)]' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-
-		<Message Text=' * Bbs 1 out DocFileItem = @(DocFileItem)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-		<Message Text=' * Bbs 1 out IntermediateAssembly = @(IntermediateAssembly)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-		<Message Text=' * Bbs 1 out _DebugSymbolsIntermediatePath = @(_DebugSymbolsIntermediatePath)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-		<Message Text=' * Bbs 1 out CustomAdditionalCompileOutputs = @(CustomAdditionalCompileOutputs)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-		<!-- But set property only during task execution, prohibit Output Inference -->
-		<CreateProperty Value="CompileAnyway">
-			<Output PropertyName="BbsState" TaskParameter="ValueSetByTask" />
-		</CreateProperty>
-	</Target>
-
-	<Target
-		Condition="'$(BbsState)'=='CompileAnyway' AND $(BbsDiag)"
-		Name="Bbs1_5_MSBuildAllProjects"
-		BeforeTargets='CoreCompile'
-		Inputs="$(MSBuildAllProjects)"
-		Outputs="@(DocFileItem);
-			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
-			@(CustomAdditionalCompileOutputs)"
-		Returns=""
-	>
-		<ItemGroup>
-			<x Remove="@(x)" />
-			<x Include="$(MSBuildAllProjects)" />
-		</ItemGroup>
-		<Message Text=' * Bbs 1.5 Triggered by MSBuildAllProjects = $(MSBuildAllProjects)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-		<Message Text='Item %(x.FileName) - %(x.ModifiedTime) - %(x.Identity)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)"  />
-	</Target>
-	<Target
-		Condition="'$(BbsState)'=='CompileAnyway' AND $(BbsDiag)"
-		Name="Bbs1_5_Compile"
-		BeforeTargets='CoreCompile'
-		Inputs="@(Compile)"
-		Outputs="@(DocFileItem);
-			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
-			@(CustomAdditionalCompileOutputs)"
-		Returns=""
-	>
-		<Message Text=' * Bbs 1.5 Triggered by Compile = @(Compile)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-	</Target>
-	<Target
-		Condition="'$(BbsState)'=='CompileAnyway' AND $(BbsDiag)"
-		Name="Bbs1_5__CoreCompileResourceInputs"
-		BeforeTargets='CoreCompile'
-		Inputs="@(_CoreCompileResourceInputs)"
-		Outputs="@(DocFileItem);
-			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
-			@(CustomAdditionalCompileOutputs)"
-		Returns=""
-	>
-		<Message Text=' * Bbs 1.5 Triggered by _CoreCompileResourceInputs = @(_CoreCompileResourceInputs)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-	</Target>
-	<Target
-		Condition="'$(BbsState)'=='CompileAnyway' AND $(BbsDiag)"
-		Name="Bbs1_5_ApplicationIcon"
-		BeforeTargets='CoreCompile'
-		Inputs="$(ApplicationIcon)"
-		Outputs="@(DocFileItem);
-			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
-			@(CustomAdditionalCompileOutputs)"
-		Returns=""
-	>
-		<Message Text=' * Bbs 1.5 Triggered by ApplicationIcon = $(ApplicationIcon)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-	</Target>
-	<Target
-		Condition="'$(BbsState)'=='CompileAnyway' AND $(BbsDiag)"
-		Name="Bbs1_5_AssemblyOriginatorKeyFile"
-		BeforeTargets='CoreCompile'
-		Inputs="$(AssemblyOriginatorKeyFile)"
-		Outputs="@(DocFileItem);
-			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
-			@(CustomAdditionalCompileOutputs)"
-		Returns=""
-	>
-		<Message Text=' * Bbs 1.5 Triggered by AssemblyOriginatorKeyFile = $(AssemblyOriginatorKeyFile)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-	</Target>
-	<Target
-		Condition="'$(BbsState)'=='CompileAnyway' AND $(BbsDiag)"
-		Name="Bbs1_5_CompiledLicenseFile"
-		BeforeTargets='CoreCompile'
-		Inputs="@(CompiledLicenseFile)"
-		Outputs="@(DocFileItem);
-			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
-			@(CustomAdditionalCompileOutputs)"
-		Returns=""
-	>
-		<Message Text=' * Bbs 1.5 Triggered by CompiledLicenseFile = @(CompiledLicenseFile)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-	</Target>
-	<Target
-		Condition="'$(BbsState)'=='CompileAnyway' AND $(BbsDiag)"
-		Name="Bbs1_5_EmbeddedDocumentation"
-		BeforeTargets='CoreCompile'
-		Inputs="@(EmbeddedDocumentation)"
-		Outputs="@(DocFileItem);
-			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
-			@(CustomAdditionalCompileOutputs)"
-		Returns=""
-	>
-		<Message Text=' * Bbs 1.5 Triggered by EmbeddedDocumentation = @(EmbeddedDocumentation)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-	</Target>
-	<Target
-		Condition="'$(BbsState)'=='CompileAnyway' AND $(BbsDiag)"
-		Name="Bbs1_5_Win32Resource"
-		BeforeTargets='CoreCompile'
-		Inputs="$(Win32Resource)"
-		Outputs="@(DocFileItem);
-			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
-			@(CustomAdditionalCompileOutputs)"
-		Returns=""
-	>
-		<Message Text=' * Bbs 1.5 Triggered by Win32Resource = $(Win32Resource)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-	</Target>
-	<Target
-		Condition="'$(BbsState)'=='CompileAnyway' AND $(BbsDiag)"
-		Name="Bbs1_5_Win32Manifest"
-		BeforeTargets='CoreCompile'
-		Inputs="$(Win32Manifest)"
-		Outputs="@(DocFileItem);
-			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
-			@(CustomAdditionalCompileOutputs)"
-		Returns=""
-	>
-		<Message Text=' * Bbs 1.5 Triggered by Win32Manifest = $(Win32Manifest)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-	</Target>
-	<Target
-		Condition="'$(BbsState)'=='CompileAnyway' AND $(BbsDiag)"
-		Name="Bbs1_5_CustomAdditionalCompileInputs"
-		BeforeTargets='CoreCompile'
-		Inputs="@(CustomAdditionalCompileInputs)"
-		Outputs="@(DocFileItem);
-			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
-			@(CustomAdditionalCompileOutputs)"
-		Returns=""
-	>
-
-	<Message Text=' * Bbs 1.5 Triggered by CustomAdditionalCompileInputs = @(CustomAdditionalCompileInputs)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-	</Target>
-
-	<UsingTask TaskName="BbsDecide" AssemblyFile="BBS.DLL" />
-
+	-->
+	
 	<!-- TODO Move to dll or to targets for performance reasons -->
-	<UsingTask TaskName="BbsCopyHashes" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+	<UsingTask TaskName="BbsCopyLocalReference" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
 		<ParameterGroup>
-			<References Required="True" ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
-			<IntermediateOutputPath Required="True" />
+			<ReferenceCopyLocalPaths Required="True" ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
+			<OutDir Required="True" />
 		</ParameterGroup>
 		<Task>
 			<Reference Include="System" />
@@ -259,16 +64,32 @@
 			<Using Namespace="System" />
 			<Using Namespace="System.IO" />
 			<Using Namespace="System.Linq" />
+			<Using Namespace="Microsoft.Build.Framework" />
 			<Code Type="Fragment" Language="cs">
 			<![CDATA[
-foreach (var reference in References)
+Log.LogMessage(MessageImportance.High, " * BbsCopyLocalReference # Enter");
+
+foreach (var reference in ReferenceCopyLocalPaths)
 {
-	var spec = (string)reference.ItemSpec;
-	var bssFileName = Path.Combine(Path.GetDirectoryName(spec), Path.GetFileNameWithoutExtension(spec) + ".bbs");
-	if (File.Exists(bssFileName))
+	// we should copy only file that has corresponding .bbs file near them that is actually out of date
+	var name = reference.GetMetadata("FileName");
+	var dll = reference.GetMetadata("FullPath");
+	var dllTarget = Path.Combine(OutDir, reference.GetMetadata("DestinationSubDirectory"), Path.GetFileName(dll));
+	var bbs = reference.GetMetadata("FullPath")+".bbs";
+	var bbsTarget = Path.Combine(OutDir, reference.GetMetadata("DestinationSubDirectory"), Path.GetFileName(bbs));
+	
+	if (File.Exists(dll) && File.Exists(bbs))
 	{
-		var bssLocalFileName = Path.Combine(IntermediateOutputPath, Path.GetFileName(bssFileName));
-		File.Copy(bssFileName, bssLocalFileName, true);
+		if (!File.Exists(bbsTarget) || File.GetLastWriteTimeUtc(bbs) > File.GetLastWriteTimeUtc(bbsTarget))
+		{
+			Log.LogMessage(MessageImportance.High, " * BbsCopyLocalReference # Update " + name);
+			File.Copy(bbs, bbsTarget, true);
+			File.Copy(dll, dllTarget, true);
+		} else {
+			Log.LogMessage(MessageImportance.High, " * BbsCopyLocalReference # Skip " + name);
+		}
+	} else {
+		Log.LogMessage(MessageImportance.High, " * BbsCopyLocalReference # N/A " + name);
 	}
 }
 			]]>
@@ -276,131 +97,39 @@ foreach (var reference in References)
 		</Task>
 	</UsingTask>
 	
-	<Target
-	Condition="'$(BbsState)'=='Initial'"
-	Name='Bbs2CoreCompileGoingToInvalidateOnlyByReferencePath'
-	BeforeTargets='CoreCompile'
-	Inputs='@(ReferencePath)'
-	Outputs='@(DocFileItem);
-			@(IntermediateAssembly);
-			@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
-			@(CustomAdditionalCompileOutputs)'
-	Returns=""
-
-	>
-		<Message Text=' * Bbs 2 CoreCompileGoingToInvalidateOnlyByReferencePath [BbsState = $(BbsState)]' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-		<!-- We should make a further decisions and tricky actions! -->
-		<!-- Fight Against Output Inference -->
-		<CallTarget Targets="Bbs2Exec" />
-		<CreateProperty Value="Trial">
-			<Output PropertyName="BbsState" TaskParameter="ValueSetByTask" />
-		</CreateProperty>
-	</Target>
-
-	<Target Name="Bbs2Exec">
-		<Message Text=' * Bbs 2 Exec' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-		<!--
-			[TASK]
-			[aggregate reference paths with hashes      ]
-			[make a list with excluded identical hashes ]
-			set references to remained list
-			set BbsState to 'trial' stage
-			clear references at all // here either bowth CoreCompile and Trial will be skipped or Trial rus and restore references
-			if 'trial' target runs - set compile anyway and restore references
-		-->
-		<ItemGroup>
-			<ReferencesAlive Remove="@(ReferencesAlive)" />
-		</ItemGroup>
-		<BbsDecide References="@(ReferencePath)" IntermediateOutputPath="$(IntermediateOutputPath)" BbsDiagLevel="$(BbsDiagLevel)">
-			<Output TaskParameter="ReferencesAlive" ItemName="ReferencesAlive"></Output>
-		</BbsDecide>
-		<ItemGroup>
-			<ReferencePath Remove="@(ReferencePath)" />
-		</ItemGroup>
-		<ItemGroup>
-			<ReferencePath Include="@(ReferencesAlive)" />
-		</ItemGroup>
-		<PropertyGroup>
-			<NonExistentFile></NonExistentFile>
-		</PropertyGroup>
+	<Target Name='BbsCopyLocalReference' AfterTargets='CopyFilesToOutputDirectory' Condition="'$(UseCommonOutputDirectory)' != 'true' and $(BbsEnabled)">
+		<BbsCopyLocalReference ReferenceCopyLocalPaths="@(ReferenceCopyLocalPaths)" OutDir="$(OutDir)" />
 	</Target>
 	
-	<Target Name="Bbs3Trial"
-		Condition="'$(BbsState)'=='Trial'"
-		BeforeTargets='CoreCompile' 
-		Inputs="$(MSBuildAllProjects);
-				@(Compile);
-				@(_CoreCompileResourceInputs);
-				$(ApplicationIcon);
-				$(AssemblyOriginatorKeyFile);
-				@(ReferencePath);
-				@(CompiledLicenseFile);
-				@(EmbeddedDocumentation); 
-				$(Win32Resource);
-				$(Win32Manifest);
-				@(CustomAdditionalCompileInputs)"
-		Outputs="@(DocFileItem);
-				@(IntermediateAssembly);
-				@(_DebugSymbolsIntermediatePath);$(NonExistentFile);
-				@(CustomAdditionalCompileOutputs)"
-		Returns=""
-	>
-		<!-- If it is triggered - rollback immediately -->
-		<Message Text=' * Bbs 3 Trial [BbsState = $(BbsState)]' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-		<CreateProperty Value="CompileAnyway">
-			<Output PropertyName="BbsState" TaskParameter="ValueSetByTask" />
-		</CreateProperty>
+	<!-- optimized for partial build -->
+	<!--
+	<Target Name='BbsCopyLocalReference' AfterTargets='CopyFilesToOutputDirectory' Condition="'$(UseCommonOutputDirectory)' != 'true' and $(BbsEnabled)" Inputs="@(BbsReferenceCopyLocalPaths)" Outputs="@(BbsReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')">
+		<Message Text=' * Bbs CopyFilesMarkedCopyLocal Retries=$(CopyRetryCount) Delay=$(CopyRetryDelayMilliseconds)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
+		<Message Text=' * Bbs CopyFilesMarkedCopyLocal %(BbsReferenceCopyLocalPaths.Identity)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag) and '$(UseCommonOutputDirectory)' != 'true' and Exists(%(BbsReferenceCopyLocalPaths.FullPath)) and Exists('%(BbsReferenceCopyLocalPaths.OriginalFile)')" />
+		<Copy
+			Condition="Exists(%(BbsReferenceCopyLocalPaths.FullPath)"
+			SourceFiles="%(BbsReferenceCopyLocalPaths.FullPath)"
+			DestinationFiles="$(OutDir)%(BbsReferenceCopyLocalPaths.DestinationSubDirectory)%(BbsReferenceCopyLocalPaths.Filename)%(BbsReferenceCopyLocalPaths.Extension)"
+			SkipUnchangedFiles="True"
+			OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)"
+			Retries="$(CopyRetryCount)"
+			RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"
+			UseHardlinksIfPossible="False"
+			>
+			<Output TaskParameter="DestinationFiles" ItemName="FileWritesShareable"/>
+		</Copy>
+		<Copy
+			Condition="'$(UseCommonOutputDirectory)' != 'true' and Exists(%(BbsReferenceCopyLocalPaths.FullPath)) and Exists('%(BbsReferenceCopyLocalPaths.OriginalFile)')"
+			SourceFiles="%(BbsReferenceCopyLocalPaths.OriginalFile)"
+			DestinationFiles="$(OutDir)%(BbsReferenceCopyLocalPaths.DestinationSubDirectory)%(BbsReferenceCopyLocalPaths.OriginalFilename)%(BbsReferenceCopyLocalPaths.OriginalExtension)"
+			SkipUnchangedFiles="False"
+			OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)"
+			Retries="$(CopyRetryCount)"
+			RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"
+			UseHardlinksIfPossible="$(CreateHardLinksForCopyLocalIfPossible)"
+			>
+			<Output TaskParameter="DestinationFiles" ItemName="FileWritesShareable"/>
+		</Copy>
 	</Target>
-	
-	<Target
-		Condition="'$(BbsState)'=='CompileAnyway'"
-		Name="Bbs4_Rollback"
-		BeforeTargets='CoreCompile'
-		>
-		<Message Text=' * Bbs 4 Rollback [BbsState = $(BbsState)]' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-		<ItemGroup>
-			<ReferencePath Remove="@(ReferencePath)" />
-			<ReferencePath Include="@(BbsReferencePathBackup)" />
-		</ItemGroup>
-		<PropertyGroup>
-			<NonExistentFile>$(NonExistentFileBak)</NonExistentFile>
-		</PropertyGroup>
-	</Target>
-	
-	<Target Name='BbsAfterCompile' AfterTargets='CoreCompile' Condition="'$(BbsEnabled)'=='True'">
-		<ItemGroup>
-			<ReferencePath Remove="@(ReferencePath)" />
-			<ReferencePath Include="@(BbsReferencePathBackup)" />
-		</ItemGroup>
-	
-		<Message Text=' * Bbs AfterCompile [BbsState = $(BbsState)]' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-		<Message Text=' * Bbs AfterCompile [ReferencePath = @(ReferencePath)]' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-
-		<Message Text=' * Bbs Standard Incremental Build [$(ProjectName)]' Importance='high' Condition="'$(BbsState)'=='Initial'"/>
-		<Message Text=' * Bbs We Can`t Omit Core Compile Step [$(ProjectName)]' Importance='high' Condition="'$(BbsState)'=='CompileAnyway'"/>
-		<Message Text=' * Bbs We Have Successfully Omited Core Compile Step [$(ProjectName)]' Importance='high' Condition="'$(BbsState)'=='Trial'"/>
-		
-		<!--
-		<BbsCopyHashes References="@(ReferencePath)" IntermediateOutputPath="$(IntermediateOutputPath)">
-		</BbsCopyHashes>
-		-->
-
-	</Target>
-
-	<Target Name='BbsTriggeredByCompilation' Condition="'$(BbsEnabled)'=='True'">
-		<!--
-		<Message Text=' * Bbs TriggeredByCompilation [BbsState = $(BbsState)] [$(TargetsTriggeredByCompilation)]' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-		<Error Condition="'$(BbsState)'==''" Text="BBS Assertion: State unknown" />
-		<Error Condition="'$(BbsState)'=='Trial'" Text="BBS Assertion: Sorry, CoreCompile were executed but BBS state is Trial. Please contact developers." />
-		<Error Condition="'@(ReferencePath)' != '@(BbsReferencePathBackup)'" Text="BBS Assertion: Sorry, CoreCompile were executed with invalid reference list. Make sure that MSBUILD version is compatible with BBS" />
-		<BbsCopyHashes References="@(ReferencePath)" IntermediateOutputPath="$(IntermediateOutputPath)">
-		</BbsCopyHashes>
 	-->
-	</Target>
-	
-	<Target Name='BbsCopyHashesAfterCoreCompile' Condition="'$(BbsEnabled)'=='True'" AfterTargets="CoreCompile" >
-		<Message Text=' * Bbs BbsCopyHashesAfterCoreCompile [BbsState = $(BbsState)]' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-		<BbsCopyHashes References="@(ReferencePath)" IntermediateOutputPath="$(IntermediateOutputPath)">
-		</BbsCopyHashes>
-	</Target>
 </Project>

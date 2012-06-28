@@ -8,10 +8,10 @@ namespace Sample
 	{
 		public int X()
 		{
-			return 83;
+			return 127;
 		}
 
-		public MyUtils2(bool q)
+		public MyUtils2(int q)
 		{
 			
 		}

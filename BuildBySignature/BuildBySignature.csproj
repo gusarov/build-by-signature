@@ -67,7 +67,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BbsDecide.cs" />
     <Compile Include="GenerateHashTask.cs" />
     <Compile Include="Hasher.cs" />
     <Compile Include="Installers.cs">
@@ -98,14 +97,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
-    <None Include="..\BBS_Before.targets">
-      <Link>BBS_Before.targets</Link>
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>:: xcopy /y /i /d *.* $(ProjectDir)..\_bin</PostBuildEvent>
+    <PostBuildEvent>xcopy /y /i /d *.* $(ProjectDir)..\_bin</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -39,7 +39,7 @@ namespace BuildBySignature
 			var referencesAlive = new List<ITaskItem>();
 			foreach (var reference in References)
 			{
-				var spec = Path.GetFullPath(reference.ItemSpec);
+				var spec = Path.GetFullPath(referencezItemSpec);
 				if (File.Exists(spec))
 				{
 					var bssFileName = Path.Combine(Path.GetDirectoryName(spec), Path.GetFileNameWithoutExtension(spec) + ".bbs");

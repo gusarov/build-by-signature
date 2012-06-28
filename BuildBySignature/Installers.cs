@@ -116,10 +116,10 @@ namespace BuildBySignature
 
 		void ProcessFiles(bool appendOrRemoveOnly)
 		{
-			foreach (var item in MsBuildTargetsToProcess(false))
-			{
-				ProcessFile(item, appendOrRemoveOnly, false);
-			}
+//			foreach (var item in MsBuildTargetsToProcess(false))
+//			{
+//				ProcessFile(item, appendOrRemoveOnly, false);
+//			}
 			foreach (var item in MsBuildTargetsToProcess(true))
 			{
 				ProcessFile(item, appendOrRemoveOnly, true);
