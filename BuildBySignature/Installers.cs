@@ -30,7 +30,7 @@ namespace BuildBySignature
 		IEnumerable<string> MsBuildTargetsToProcess(bool afterOrBefore)
 		{
 			// yield return GetMsBuildTargetsPath("v2.0", afterOrBefore);
-			yield return GetMsBuildTargetsPath("v3.5", afterOrBefore);
+			//yield return GetMsBuildTargetsPath("v3.5", afterOrBefore);
 			yield return GetMsBuildTargetsPath("v4.0", afterOrBefore);
 		}
 
@@ -116,10 +116,10 @@ namespace BuildBySignature
 
 		void ProcessFiles(bool appendOrRemoveOnly)
 		{
-			foreach (var item in MsBuildTargetsToProcess(false))
-			{
-				ProcessFile(item, appendOrRemoveOnly, false);
-			}
+//			foreach (var item in MsBuildTargetsToProcess(false))
+//			{
+//				ProcessFile(item, appendOrRemoveOnly, false);
+//			}
 			foreach (var item in MsBuildTargetsToProcess(true))
 			{
 				ProcessFile(item, appendOrRemoveOnly, true);
