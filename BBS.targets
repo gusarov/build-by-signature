@@ -27,6 +27,12 @@
 		</PropertyGroup>
 	</Target>
 
+<!--	
+	<PropertyGroup>
+		<CreateHardLinksForCopyLocalIfPossible Condition="'$(BuildingInsideVisualStudio)' != 'true'">true</CreateHardLinksForCopyLocalIfPossible>
+	</PropertyGroup>
+-->
+
 	<UsingTask AssemblyFile='BBS.DLL' TaskName='GenerateHashTask' />
 
 	<Target Name='BbsGenerateHash' AfterTargets='CopyFilesToOutputDirectory' Inputs='$(TargetPath)' Outputs='$(TargetPath).bbs' Condition="$(BbsEnabled)">
