@@ -1,8 +1,18 @@
 <Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003'>
 
+	<!-- Disable host compiler -->
+	<!-- In real production BBS benifit is much more significant then lack of HostCompiler optimization -->
+	<PropertyGroup>
+		<UseHostCompilerIfAvailable>False</UseHostCompilerIfAvailable>
+		<BuildingInsideVisualStudio>False</BuildingInsideVisualStudio>
+	</PropertyGroup>
+	
 	<Target Name='BbsDetectDiagnostic' AfterTargets='CopyFilesToOutputDirectory'>
 		<PropertyGroup Condition="'$(BbsDiag)'==''">
 			<BbsDiag>$(registry:HKEY_CURRENT_USER\Software\Bbs@Diagnostic)</BbsDiag>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(BbsDiag)'==''">
+			<BbsDiag>$(registry:HKEY_LOCAL_MACHINE\Software\Bbs@Diagnostic)</BbsDiag>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(BbsDiag)'==''">
 			<BbsDiag>False</BbsDiag>
@@ -27,39 +37,39 @@
 		</PropertyGroup>
 	</Target>
 
-<!--	
-	<PropertyGroup>
-		<CreateHardLinksForCopyLocalIfPossible Condition="'$(BuildingInsideVisualStudio)' != 'true'">true</CreateHardLinksForCopyLocalIfPossible>
-	</PropertyGroup>
+<!--
 -->
-
 	<UsingTask AssemblyFile='BBS.DLL' TaskName='GenerateHashTask' />
-
 	<Target Name='BbsGenerateHash' AfterTargets='CopyFilesToOutputDirectory' Inputs='$(TargetPath)' Outputs='$(TargetPath).bbs' Condition="$(BbsEnabled)">
 		<Message Text=' * Bbs GenerateHash $(TargetName)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
 		<GenerateHashTask
 			ContinueOnError="True"
 			RevertTargetStamp="True"
 			TargetPath='$(TargetPath)'
-			OutputPath='$(TargetPath).bbs'
+			BbsPath='$(TargetPath).bbs'
 			>
 		</GenerateHashTask>
 	</Target>
 	
-	<!--
-	<Target Name='BbsGenerateCopyLocalReference' AfterTargets='CopyFilesToOutputDirectory' Condition="$(BbsEnabled)">
-		<ItemGroup>
-			<BbsReferenceCopyLocalPaths Remove='@BbsReferenceCopyLocalPaths' />
-			<BbsReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths->'%(Identity).bbs')">
-				<OriginalFile>%(Identity)</OriginalFile>
-				<OriginalFilename>%(Filename)</OriginalFilename>
-				<OriginalExtension>%(Extension)</OriginalExtension>
-			</BbsReferenceCopyLocalPaths>
-		</ItemGroup>
+<!--
+-->
+	<UsingTask AssemblyFile='BBS.DLL' TaskName='RevertTargetStampTask' />
+	<Target Name='BbsRevertTargetStamp' AfterTargets='CopyFilesToOutputDirectory' Condition="$(BbsEnabled)">
+		<Message Text=' * Bbs BbsRevertTargetStamp $(TargetName)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
+		<RevertTargetStampTask
+			ContinueOnError="True"
+			TargetPath='$(TargetPath)'
+			BbsPath='$(TargetPath).bbs'
+			>
+		</RevertTargetStampTask>
 	</Target>
-	-->
 	
-	<!-- TODO Move to dll or to targets for performance reasons -->
+	<UsingTask AssemblyFile='BBS.DLL' TaskName='BbsCopyLocalReference' />
+	<Target Name='BbsCopyLocalReference' AfterTargets='CopyFilesToOutputDirectory' Condition="'$(UseCommonOutputDirectory)' != 'true' and $(BbsEnabled)">
+		<BbsCopyLocalReference ReferenceCopyLocalPaths="@(ReferenceCopyLocalPaths)" OutDir="$(OutDir)" />
+	</Target>
+
+	<!-- Moved to dll for performance reasons, but leaved here for flexibility and quick patching
 	<UsingTask TaskName="BbsCopyLocalReference" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
 		<ParameterGroup>
 			<ReferenceCopyLocalPaths Required="True" ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
@@ -84,59 +94,29 @@ foreach (var reference in ReferenceCopyLocalPaths)
 	var dllTarget = Path.Combine(OutDir, reference.GetMetadata("DestinationSubDirectory"), Path.GetFileName(dll));
 	var bbs = reference.GetMetadata("FullPath")+".bbs";
 	var bbsTarget = Path.Combine(OutDir, reference.GetMetadata("DestinationSubDirectory"), Path.GetFileName(bbs));
+	var ext = Path.GetExtension(dll);
 	
-	if (File.Exists(dll) && File.Exists(bbs))
+	if (/*File.Exists(dll) &&*/ File.Exists(bbs))
 	{
-		if (!File.Exists(bbsTarget) || File.GetLastWriteTimeUtc(bbs) > File.GetLastWriteTimeUtc(bbsTarget))
+		if (!File.Exists(bbsTarget))
 		{
-			Log.LogMessage(MessageImportance.High, " * BbsCopyLocalReference # Update " + name);
+			Log.LogMessage(MessageImportance.High, " * BbsCopyLocalReference # [First Time] " + name+ext);
 			File.Copy(bbs, bbsTarget, true);
+		} else if (File.GetLastWriteTimeUtc(bbs) > File.GetLastWriteTimeUtc(bbsTarget)) {
+			Log.LogMessage(MessageImportance.High, " * BbsCopyLocalReference # [Update] " + name+ext);
 			File.Copy(dll, dllTarget, true);
+			File.Copy(bbs, bbsTarget, true);
 		} else {
-			Log.LogMessage(MessageImportance.High, " * BbsCopyLocalReference # Skip " + name);
+			Log.LogMessage(MessageImportance.High, " * BbsCopyLocalReference # [Skip] " + name+ext);
 		}
 	} else {
-		Log.LogMessage(MessageImportance.High, " * BbsCopyLocalReference # N/A " + name);
+		Log.LogMessage(MessageImportance.High, " * BbsCopyLocalReference # [N/A - no bbs] " + name+ext);
 	}
 }
 			]]>
 			</Code>
 		</Task>
 	</UsingTask>
-	
-	<Target Name='BbsCopyLocalReference' AfterTargets='CopyFilesToOutputDirectory' Condition="'$(UseCommonOutputDirectory)' != 'true' and $(BbsEnabled)">
-		<BbsCopyLocalReference ReferenceCopyLocalPaths="@(ReferenceCopyLocalPaths)" OutDir="$(OutDir)" />
-	</Target>
-	
-	<!-- optimized for partial build -->
-	<!--
-	<Target Name='BbsCopyLocalReference' AfterTargets='CopyFilesToOutputDirectory' Condition="'$(UseCommonOutputDirectory)' != 'true' and $(BbsEnabled)" Inputs="@(BbsReferenceCopyLocalPaths)" Outputs="@(BbsReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')">
-		<Message Text=' * Bbs CopyFilesMarkedCopyLocal Retries=$(CopyRetryCount) Delay=$(CopyRetryDelayMilliseconds)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag)" />
-		<Message Text=' * Bbs CopyFilesMarkedCopyLocal %(BbsReferenceCopyLocalPaths.Identity)' Importance="$(BbsDiagLevel)" Condition="$(BbsDiag) and '$(UseCommonOutputDirectory)' != 'true' and Exists(%(BbsReferenceCopyLocalPaths.FullPath)) and Exists('%(BbsReferenceCopyLocalPaths.OriginalFile)')" />
-		<Copy
-			Condition="Exists(%(BbsReferenceCopyLocalPaths.FullPath)"
-			SourceFiles="%(BbsReferenceCopyLocalPaths.FullPath)"
-			DestinationFiles="$(OutDir)%(BbsReferenceCopyLocalPaths.DestinationSubDirectory)%(BbsReferenceCopyLocalPaths.Filename)%(BbsReferenceCopyLocalPaths.Extension)"
-			SkipUnchangedFiles="True"
-			OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)"
-			Retries="$(CopyRetryCount)"
-			RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"
-			UseHardlinksIfPossible="False"
-			>
-			<Output TaskParameter="DestinationFiles" ItemName="FileWritesShareable"/>
-		</Copy>
-		<Copy
-			Condition="'$(UseCommonOutputDirectory)' != 'true' and Exists(%(BbsReferenceCopyLocalPaths.FullPath)) and Exists('%(BbsReferenceCopyLocalPaths.OriginalFile)')"
-			SourceFiles="%(BbsReferenceCopyLocalPaths.OriginalFile)"
-			DestinationFiles="$(OutDir)%(BbsReferenceCopyLocalPaths.DestinationSubDirectory)%(BbsReferenceCopyLocalPaths.OriginalFilename)%(BbsReferenceCopyLocalPaths.OriginalExtension)"
-			SkipUnchangedFiles="False"
-			OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)"
-			Retries="$(CopyRetryCount)"
-			RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"
-			UseHardlinksIfPossible="$(CreateHardLinksForCopyLocalIfPossible)"
-			>
-			<Output TaskParameter="DestinationFiles" ItemName="FileWritesShareable"/>
-		</Copy>
-	</Target>
 	-->
+	
 </Project>
