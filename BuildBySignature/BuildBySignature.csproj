@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BbsCopyLocalReference.cs" />
     <Compile Include="GenerateHashTask.cs" />
     <Compile Include="Hasher.cs" />
     <Compile Include="Installers.cs">
