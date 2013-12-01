@@ -33,7 +33,7 @@
 			<BbsEnabled>$(registry:HKEY_LOCAL_MACHINE\Software\Bbs@Enabled)</BbsEnabled>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(BbsEnabled)'==''">
-			<BbsEnabled>False</BbsEnabled>
+			<BbsEnabled>True</BbsEnabled>
 		</PropertyGroup>
 	</Target>
 

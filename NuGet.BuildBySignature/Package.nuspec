@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>bbs</id>
+    <version>1.0.6</version>
+    <title>Build By Signature</title>
+    <authors>Dmitry Gusarov</authors>
+    <owners></owners>
+    <description>
+			This tool can significantly speedup build process of a large solutions by not triggering rebuild for all dependencies each time. Only public metadata changes (like method signatures) are triggering rebuild.
+		</description>
+    <releaseNotes></releaseNotes>
+    <summary>
+      Speedup your build
+    </summary>
+    <language>en-US</language>
+    <projectUrl>http://code.google.com/p/build-by-signature/</projectUrl>
+    <iconUrl>https://nuget.org/Content/Images/packageDefaultIcon-50x50.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>http://opensource.org/licenses/BSD-3-Clause</licenseUrl>
+    <copyright>Copyright Dmitry Gusarov 2013</copyright>
+    <dependencies>
+      <group targetFramework="net40">
+        <!--
+          <dependency id="log4net" version="1.2.10" />
+					-->
+      </group>
+    </dependencies>
+    <references></references>
+    <tags></tags>
+  </metadata>
+  <files>
+    <file src="bin\build\" target="build" />
+    <!--
+		<file src="lib\" target="lib" />
+    <file src="tools\" target="tools" />
+		-->
+    <file src="bin\content\" target="content" />
+  </files>
+</package>
