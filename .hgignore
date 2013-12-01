@@ -12,3 +12,8 @@ Release/
 *.psess
 *.vsp
 *.vs10x
+*.bak
+*.log
+UpgradeLog.htm
+packages/
+*.nupkg
