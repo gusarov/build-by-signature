@@ -18,9 +18,22 @@ namespace BuildBySignature
 		[Required]
 		public string OutDir { get; set; }
 
+		public string BbsDiagLevel
+		{
+			get { return _bbsDiagLevel; }
+			set
+			{
+				_bbsDiagLevel = value;
+				_bbsDiagLevelEnum = (MessageImportance)Enum.Parse(typeof(MessageImportance), value);
+			}
+		}
+
+		private MessageImportance _bbsDiagLevelEnum;
+		private string _bbsDiagLevel;
+
 		public override bool Execute()
 		{
-			Log.LogMessage(MessageImportance.High, " * BbsCopyLocalReference # Enter");
+			Log.LogMessage(BbsDiagLevel, " * BbsCopyLocalReference # Enter");
 
 			foreach (var reference in ReferenceCopyLocalPaths)
 			{
@@ -38,23 +51,23 @@ namespace BuildBySignature
 					DateTime bbsd, bbsTargetd;
 					if (!File.Exists(bbsTarget))
 					{
-						Log.LogMessage(MessageImportance.High, " * BbsCopyLocalReference # [First Time] " + name + ext);
+						Log.LogMessage(BbsDiagLevel, " * BbsCopyLocalReference # [First Time] " + name + ext);
 						File.Copy(bbs, bbsTarget, true);
 					}
 					else if ((bbsd = File.GetLastWriteTimeUtc(bbs)) > (bbsTargetd = File.GetLastWriteTimeUtc(bbsTarget)))
 					{
-						Log.LogMessage(MessageImportance.High, " * BbsCopyLocalReference # [Update] " + name + ext + " src_bbs=" + bbsd + " trg_bbs=" + bbsTargetd);
+						Log.LogMessage(BbsDiagLevel, " * BbsCopyLocalReference # [Update] " + name + ext + " src_bbs=" + bbsd + " trg_bbs=" + bbsTargetd);
 						File.Copy(dll, dllTarget, true);
 						File.Copy(bbs, bbsTarget, true);
 					}
 					else
 					{
-						Log.LogMessage(MessageImportance.High, " * BbsCopyLocalReference # [Skip] " + name + ext);
+						Log.LogMessage(BbsDiagLevel, " * BbsCopyLocalReference # [Skip] " + name + ext);
 					}
 				}
 				else
 				{
-					Log.LogMessage(MessageImportance.High, " * BbsCopyLocalReference # [N/A - no bbs] " + name + ext);
+					Log.LogMessage(BbsDiagLevel, " * BbsCopyLocalReference # [N/A - no bbs] " + name + ext);
 				}
 			}
 			return true;

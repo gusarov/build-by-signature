@@ -55,55 +55,41 @@
     <None Include="NuGet.exe" />
     <None Include="NuGet.config" />
     <None Include="Package.nuspec" />
-    <None Include="tools\init.ps1" />
-    <None Include="tools\install.ps1" />
-    <None Include="tools\uninstall.ps1" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="lib\" />
     <Folder Include="Properties\" />
-    <Folder Include="src\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\BbsManager\bin\Release\BbsManager.exe">
-      <Link>content\BbsManager.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\BbsManager\bin\Release\MyUtils.UAC.exe">
-      <Link>content\MyUtils.UAC.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\BuildBySignature\bin\Release\BBS.dll">
+    <None Include="..\BuildBySignature\bin\Release\BBS.dll">
       <Link>build\net40\BBS.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\BuildBySignature\bin\Release\Mono.Cecil.dll">
+    </None>
+    <None Include="..\BuildBySignature\bin\Release\Mono.Cecil.dll">
       <Link>build\net40\Mono.Cecil.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\BuildBySignature\bin\Release\Mono.Cecil.Mdb.dll">
+    </None>
+    <None Include="..\BuildBySignature\bin\Release\Mono.Cecil.Mdb.dll">
       <Link>build\net40\Mono.Cecil.Mdb.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\BuildBySignature\bin\Release\Mono.Cecil.Pdb.dll">
+    </None>
+    <None Include="..\BuildBySignature\bin\Release\Mono.Cecil.Pdb.dll">
       <Link>build\net40\Mono.Cecil.Pdb.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\BuildBySignature\bin\Release\Mono.Cecil.Rocks.dll">
+    </None>
+    <None Include="..\BuildBySignature\bin\Release\Mono.Cecil.Rocks.dll">
       <Link>build\net40\Mono.Cecil.Rocks.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
+    <None Include="..\BbsManager\bin\Release\BbsManager.exe">
+      <Link>manager\BbsManager.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\BbsManager\bin\Release\MyUtils.UAC.exe">
+      <Link>manager\MyUtils.UAC.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="NuSpecInc.exe" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BbsManager\BbsManager.csproj">
-      <Project>{0a7ae12d-dbb9-408b-89eb-46fa1cf8a7d5}</Project>
-      <Name>BbsManager</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\BuildBySignature\BuildBySignature.csproj">
-      <Project>{ca2d3b02-0e14-467e-a30b-a94e621f6a8c}</Project>
-      <Name>BuildBySignature</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
