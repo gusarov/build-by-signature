@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>bbs</id>
-    <version>1.0.6</version>
+    <version>1.0.17</version>
     <title>Build By Signature</title>
     <authors>Dmitry Gusarov</authors>
     <owners></owners>
@@ -35,6 +35,6 @@
 		<file src="lib\" target="lib" />
     <file src="tools\" target="tools" />
 		-->
-    <file src="bin\content\" target="content" />
+    <file src="bin\manager\" target="manager" />
   </files>
 </package>
