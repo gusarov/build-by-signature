@@ -81,8 +81,15 @@ namespace BuildBySignature
 		
 		public static int Hash(string assemblyFileName, TaskLoggingHelper log = null)
 		{
-			var asm = AssemblyDefinition.ReadAssembly(assemblyFileName);
-			return Hash(asm, log, Path.GetFileName(assemblyFileName));
+			if (File.Exists(assemblyFileName))
+			{
+				var asm = AssemblyDefinition.ReadAssembly(assemblyFileName);
+				return Hash(asm, log, Path.GetFileName(assemblyFileName));
+			}
+			else
+			{
+				return 0;
+			}
 		}
 
 		public static int Hash(AssemblyDefinition asm, TaskLoggingHelper log = null, string fileName = null)
