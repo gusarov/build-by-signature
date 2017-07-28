@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:ext="http://schemas.microsoft.com/wix/VSExtension">
+	<?define Manufacturer="Dmitry Gusarov"?>
+	<?define ProductName="Build by Signature"?>
+	<?define ProductVersion="1.0.19.0"?>
+
+	<Product Id="*" Name="$(var.ProductName)" UpgradeCode="{5C269C36-76CF-4D07-9DE2-230B436173E6}"
+			   Language="1033" Codepage="1252" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)">
+
+		<Package Id="*"
+							 Keywords="Installer"
+							 Description="The set of MSBuild extensions to optimize build process."
+							 Manufacturer="$(var.Manufacturer)"
+							 InstallerVersion="200"
+							 Languages="1033"
+							 Compressed="yes"
+							 SummaryCodepage="1252"/>
+
+		<!-- Application icon shown in Programs and Features -->
+		<Icon Id="icon.ico" SourceFile="..\_images\icon.ico"/>
+		<Property Id="ARPPRODUCTICON" Value="icon.ico" />
+
+		<Property Id="ApplicationFolderName" Value="$(var.ProductName)" />
+		<Property Id="WixAppFolder" Value="WixPerMachineFolder" />
+
+		<PropertyRef Id="NETFRAMEWORK40FULL"/>
+
+		<Property Id="MSBUILD35">
+			<DirectorySearch Id="MSBUILD35_SEARCH" AssignToProperty="yes" Path="[ProgramFilesFolder]\MSBuild\3.5"/>
+		</Property>
+
+		<Property Id="MSBUILD40">
+			<DirectorySearch Id="MSBUILD40_SEARCH" AssignToProperty="yes" Path="[ProgramFilesFolder]\MSBuild\4.0"/>
+		</Property>
+
+		<Property Id="MSBUILD120">
+			<DirectorySearch Id="MSBUILD120_SEARCH" AssignToProperty="yes" Path="[ProgramFilesFolder]\MSBuild\12.0"/>
+		</Property>
+
+		<Property Id="MSBUILD140">
+			<DirectorySearch Id="MSBUILD140_SEARCH" AssignToProperty="yes" Path="[ProgramFilesFolder]\MSBuild\14.0"/>
+		</Property>
+
+		<Condition Message="This setup requires the .NET Framework 4.0 to be installed.">
+			<![CDATA[Installed OR NETFRAMEWORK40FULL]]>
+		</Condition>		<Media Id="1" Cabinet="Data.cab" EmbedCab="yes" />
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				
+				<Directory Id="Paladyne" Name="$(var.Manufacturer)">
+					<Directory Id="APPLICATIONFOLDER" Name="$(var.ProductName)" />
+				</Directory>
+
+				<Directory Id="MSBuild" Name="MSBuild">
+
+					<!-- BBS targets and assemblies are located under MSBuild extensions directory-->
+					<Directory Id="BBS" Name="Bbs" />
+
+					<!-- Extending Microsoft.Common.Targets with BBS targets -->
+					
+					<Directory Id="v40" Name="4.0">
+						<Directory Id="Microsoft.Common.Targets.40" Name="Microsoft.Common.Targets">
+							<Directory Id="Microsoft.Common.Targets.ImportAfter.40" Name="ImportAfter" />
+						</Directory>
+					</Directory>
+
+					<Directory Id="v120" Name="12.0">
+						<Directory Id="Microsoft.Common.Targets.120" Name="Microsoft.Common.Targets">
+							<Directory Id="Microsoft.Common.Targets.ImportAfter.120" Name="ImportAfter" />
+						</Directory>
+					</Directory>
+
+					<Directory Id="v140" Name="14.0">
+						<Directory Id="Microsoft.Common.Targets.140" Name="Microsoft.Common.Targets">
+							<Directory Id="Microsoft.Common.Targets.ImportAfter.140" Name="ImportAfter" />
+						</Directory>
+					</Directory>
+
+				</Directory>
+
+			</Directory>
+
+		</Directory>
+
+		<DirectoryRef Id="APPLICATIONFOLDER">
+
+			<!-- The application folder contains BBSManager -->
+			
+			<Component Id="_BBSManager" Guid="{EF32F20A-255E-442B-8144-07FDB8D02228}">
+				<File Id="BbsManager.exe" DiskId="1" Source="..\BbsManager\bin\$(var.Configuration)\BbsManager.exe" KeyPath="yes" />
+				<File Id="MyUtils.UAC.exe" DiskId="1" Source="..\BbsManager\bin\$(var.Configuration)\MyUtils.UAC.exe" KeyPath="no" />
+				
+				<!-- Adding Manager to autostart -->
+				<RegistryValue Id="BBSManagerAutostart.Reg" Root="HKLM" Action="write"
+							Key="Software\Microsoft\Windows\CurrentVersion\Run"
+							Name="BBS Manager"
+							Value="[APPLICATIONFOLDER]BBSManager.exe"
+							Type="string" />
+			</Component>
+
+		</DirectoryRef>
+
+		<DirectoryRef Id="BBS">
+
+			<!-- BBS targets and supporting files -->
+			<Component Id="_BBSLibraries" Guid="{DCB4CC2F-B8CD-49CF-AB63-5093BE3C670A}">
+				<File Id="BBS.dll" DiskId="1" Source="..\BuildBySignature\bin\$(var.Configuration)\BBS.dll" KeyPath="no" />
+				<File Id="BBS.targets" DiskId="1" Source="..\BuildBySignature\bin\$(var.Configuration)\BBS.targets" KeyPath="yes" />
+				<File Id="Mono.Cecil.dll" DiskId="1" Source="..\BuildBySignature\bin\$(var.Configuration)\Mono.Cecil.dll" KeyPath="no" />
+				<File Id="Mono.Cecil.Mdb.dll" DiskId="1" Source="..\BuildBySignature\bin\$(var.Configuration)\Mono.Cecil.Mdb.dll" KeyPath="no" />
+				<File Id="Mono.Cecil.Pdb.dll" DiskId="1" Source="..\BuildBySignature\bin\$(var.Configuration)\Mono.Cecil.Pdb.dll" KeyPath="no" />
+				<File Id="Mono.Cecil.Rocks.dll" DiskId="1" Source="..\BuildBySignature\bin\$(var.Configuration)\Mono.Cecil.Rocks.dll" KeyPath="no" />
+			</Component>
+
+		</DirectoryRef>
+
+		<DirectoryRef Id="Microsoft.Common.Targets.ImportAfter.40">
+
+			<!-- If MSBuild 4.0 is installed - extending Microsoft.Common.Targets -->
+			<Component Id="_BBS.ImportAfter.targets.40" Guid="{42EA4604-43C2-421D-822A-0A516E585A47}">
+				<Condition>NOT MSBUILD40=""</Condition>
+				<File Id="BBS.ImportAfter.targets.40" DiskId="1" Source="..\BuildBySignature\bin\$(var.Configuration)\BBS.ImportAfter.targets" KeyPath="no" />
+			</Component>
+
+		</DirectoryRef>
+
+		<DirectoryRef Id="Microsoft.Common.Targets.ImportAfter.120">
+
+			<!-- If MSBuild 12.0 is installed - extending Microsoft.Common.Targets -->
+			<Component Id="_BBS.ImportAfter.targets.120" Guid="{FC624C0E-0D29-41ED-ACB5-C1C714E85B6C}">
+				<Condition>NOT MSBUILD120=""</Condition>
+				<File Id="BBS.ImportAfter.targets.120" DiskId="1" Source="..\BuildBySignature\bin\$(var.Configuration)\BBS.ImportAfter.targets" KeyPath="no" />
+			</Component>
+
+		</DirectoryRef>
+
+		<DirectoryRef Id="Microsoft.Common.Targets.ImportAfter.140">
+
+			<!-- If MSBuild 14.0 is installed - extending Microsoft.Common.Targets -->
+			<Component Id="_BBS.ImportAfter.targets.140" Guid="{1DC26D6D-D082-4F45-9876-EEF0A2F74721}">
+				<Condition>NOT MSBUILD140=""</Condition>
+				<File Id="BBS.ImportAfter.targets.140" DiskId="1" Source="..\BuildBySignature\bin\$(var.Configuration)\BBS.ImportAfter.targets" KeyPath="no" />
+			</Component>
+
+		</DirectoryRef>
+
+		<!-- BBSManager is an optional feature -->
+		<Feature Id="BBSManager" Level="1" AllowAdvertise="no" InstallDefault="local" Absent="allow" Title="BBS Manager" Description="Allows controlling BBS options.">
+			<ComponentRef Id="_BBSManager"/>
+		</Feature>
+
+		<!-- Core BBS feature -->
+		<Feature Id="MSBuildIntegration" Level="1" AllowAdvertise="no" InstallDefault="local" Absent="disallow" Title="MSBuild Integration" Description="Provides MSBuild support for optimizing build process.">
+			<ComponentRef Id="_BBS.ImportAfter.targets.40"/>
+			<ComponentRef Id="_BBS.ImportAfter.targets.120"/>
+			<ComponentRef Id="_BBS.ImportAfter.targets.140"/>
+			<ComponentRef Id="_BBSLibraries"/>
+		</Feature>
+
+		<Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
+
+		<Upgrade Id="{5C269C36-76CF-4D07-9DE2-230B436173E6}">
+			<UpgradeVersion
+					  OnlyDetect="no"
+					  Property="PREVIOUSVERSIONSINSTALLED"
+					  Minimum="0.0.0.0" IncludeMinimum="yes"
+					  Maximum="$(var.ProductVersion)" IncludeMaximum="no" />
+		</Upgrade>
+
+		<InstallExecuteSequence>
+			<RemoveExistingProducts After="InstallValidate" />
+		</InstallExecuteSequence>
+
+		<!-- Installing for all users by default -->
+		<Property Id="ALLUSERS" Value="1" />
+
+		<UIRef Id="WixUI_FeatureTree" />
+		
+			<!-- Autolaunch BBSManager after installation is complete -->
+			<Property Id="WixShellExecTarget" Value="[#BbsManager.exe]" />
+			<CustomAction Id="LaunchApplication"
+				BinaryKey="WixCA"
+				DllEntry="WixShellExec"
+				Impersonate="yes">
+				
+		</CustomAction>
+
+		<UI>
+			
+			<!-- Skipping EULA page -->
+			
+			<Publish Dialog="WelcomeDlg"
+				 Control="Next"
+				 Event="NewDialog"
+				 Value="CustomizeDlg"
+				 Order="5">1</Publish>
+
+			<Publish Dialog="CustomizeDlg"
+					 Control="Back"
+					 Event="NewDialog"
+					 Value="WelcomeDlg"
+					 Order="5">1</Publish>
+
+			<!-- If BBSManager was just installed - run the app after installation is complete -->
+			<Publish Dialog="ExitDialog"
+				Control="Finish"
+				Event="DoAction"
+				Value="LaunchApplication"><![CDATA[&BBSManager=3]]></Publish>
+		</UI>
+
+	</Product>
+</Wix>
