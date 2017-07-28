@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NuGet.BuildBySignature", "N
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer", "Installer", "{B7769CF3-C67C-4349-8EE4-DDE0DF233974}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "BbsInstall", "BbsInstall\BbsInstall.wixproj", "{B9DC9100-88A8-4AA1-A745-F46D012A9E96}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "BbsInstaller", "BbsInstaller\BbsInstaller.wixproj", "{B9DC9100-88A8-4AA1-A745-F46D012A9E96}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample Utils", "Sample Utils\Sample Utils.csproj", "{A60F9ED0-2BA0-41EF-A02D-1CE703879FFB}"
 EndProject
