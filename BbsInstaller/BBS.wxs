@@ -2,7 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:ext="http://schemas.microsoft.com/wix/VSExtension">
 	<?define Manufacturer="Dmitry Gusarov"?>
 	<?define ProductName="Build by Signature"?>
-	<?define ProductVersion="1.0.21.0"?>
+	<?define ProductVersion="1.1.21.0"?>
 
 	<Product Id="*" Name="$(var.ProductName)" UpgradeCode="{5C269C36-76CF-4D07-9DE2-230B436173E6}"
 			   Language="1033" Codepage="1252" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)">
