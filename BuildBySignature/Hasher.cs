@@ -110,11 +110,21 @@ namespace BuildBySignature
 
 			// there are some extra checking now... if we omit that we can proceed to public class nested to private... So lets make depth iteration instead of breadth
 			// foreach (var type in asm.GetTypes().Where(x => x.IsPublic))
-			foreach (var type in asm.Modules.SelectMany(m=>m.GetTypes().Where(t=>t.IsPublic || (_isInternalsVisible && t.IsNotPublic))))
+			foreach (var type in asm.Modules.SelectMany(m => m.GetTypes().Where(t => t.IsPublic || (_isInternalsVisible && t.IsNotPublic))))
 			{
 				Hash(type, ref hash);
 			}
+			// add module references
+			foreach (var reference in asm.Modules.SelectMany(m => m.AssemblyReferences).OrderBy(r => r.FullName))
+			{
+				Hash(reference, ref hash);
+			}
 			// Console.WriteLine("0x{0:X8} - {1}", hash, asm.FullName);
+		}
+
+		void Hash(AssemblyNameReference reference, ref int hash)
+		{
+			Hashin(ref hash, reference.FullName);
 		}
 
 		void Hash(TypeDefinition type, ref int hash)
