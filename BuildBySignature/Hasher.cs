@@ -242,7 +242,7 @@ namespace BuildBySignature
 				case MethodAttributes.Private:
 					return false;
 				default:
-					throw new ArgumentOutOfRangeException("visibility");
+					throw new ArgumentOutOfRangeException(nameof(visibility));
 			}
 		}
 
